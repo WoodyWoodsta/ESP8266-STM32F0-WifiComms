@@ -21,26 +21,35 @@ void wfi_ESP8266UARTInit(void) {
   setvbuf(stdout, NULL, _IONBF, 0);
   setvbuf(stderr, NULL, _IONBF, 0);
 
-  // Clock to USART1
-  RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
-  // Clock to GPIOA
-  RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
-  // PA9 and PA10 to AF
-  GPIOA->MODER |= GPIO_MODER_MODER9_1;
-  GPIOA->MODER |= GPIO_MODER_MODER10_1;
-  // Remap to correct AF
-  GPIOA->AFR[1] |= (1 << (1*4)); // Remap pin 9 to AF1
-  GPIOA->AFR[1] |= (1 << (2*4)); // Remap pin 10 to AF1
+  // Clocks to USART2 and GPIOA
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+
+  // PA2 and PA3 to AF1
+  GPIO_InitTypeDef GPIOAUSART2InitStruct;
+  GPIO_StructInit(&GPIOAUSART2InitStruct);
+  GPIOAUSART2InitStruct.GPIO_Mode = GPIO_Mode_AF;
+  GPIOAUSART2InitStruct.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;
+  GPIOAUSART2InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_Init(GPIOA, &GPIOAUSART2InitStruct);
+
+  GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_1);
+  GPIO_PinAFConfig(GPIOA, GPIO_PinSource3, GPIO_AF_1);
 
   // BRR = fclk / baud = fclk / 115200
   SystemCoreClockUpdate();
-  USART1->BRR = SystemCoreClock/115200;
-  USART1->CR1 |= USART_CR1_RE; // Receive enable
-  USART1->CR1 |= USART_CR1_RXNEIE; // Receive not empty interrupt enable
-  USART1->CR1 |= USART_CR1_TE; // Transmit enable
-  USART1->CR1 |= USART_CR1_UE; // USART enable
+  USART_InitTypeDef USART2InitStruct;
+  USART_StructInit(&USART2InitStruct);
+  USART2InitStruct.USART_BaudRate = 115200; // Set the baud
+  USART2InitStruct.USART_WordLength = USART_WordLength_8b;
+  USART2InitStruct.USART_StopBits = USART_StopBits_1;
+  USART2InitStruct.USART_Mode = USART_Mode_Tx | USART_Mode_Rx; // Transmit and receive enable
+  USART_Init(USART2, &USART2InitStruct);
 
-  NVIC_EnableIRQ(USART1_IRQn); // Enable interrupt on USART
+  USART_ITConfig(USART2, USART_IT_RXNE, ENABLE); // Enable "receive not empty" interrupt config
+  USART_Cmd(USART2, ENABLE);
+
+  NVIC_EnableIRQ(USART2_IRQn); // Enable interrupt on USART1
 }
 
 void USART2_IRQHandler(void) {
@@ -67,7 +76,7 @@ void USART2_IRQHandler(void) {
   }
   // Check for impending overrun
   if (buffer_pointer >= BUFFER_SIZE) {
-    printf("ERROR 3: buffer overrun\r\n");
+    srl_sendData("ERROR 3: buffer overrun\r\n");
     buffer_pointer = 0;
     write(0, "> ", 2);  // Ready for next command
   }

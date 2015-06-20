@@ -7,6 +7,7 @@
 int main(int argc, char* argv[]) {
 
   wfi_ESP8266UARTInit();
+  srl_UARTUSBSerialInit();
   lcd_init();
 
   int i = 0;
@@ -14,7 +15,7 @@ int main(int argc, char* argv[]) {
   int8_t testInt = 125;
   int8_t testInt2 = 3;
   while (1) {
-    wfi_sendData("Hello World - %i\r\n", j);
+    srl_sendData("Hello World - %i\r\n", j);
     for(i = 0; i < 10000000; i++);
     j++;
   }

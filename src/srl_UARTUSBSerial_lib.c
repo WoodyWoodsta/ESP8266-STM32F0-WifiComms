@@ -1,11 +1,16 @@
 // == Includes ==
 #include "srl_UARTUSBSerial_lib.h"
+
 #include <string.h>
 #include <stdio.h>
 #include "stdarg.h"
 #include "assert.h"
 #include "stdlib.h"
 #include <unistd.h>
+
+#include "stm32f0xx_rcc.h"
+#include "stm32f0xx_usart.h"
+#include "stm32f0xx_gpio.h"
 
 // == Defines ==
 #define BUFFER_SIZE 64
@@ -19,26 +24,35 @@ void srl_UARTUSBSerialInit(void) {
   setvbuf(stdout, NULL, _IONBF, 0);
   setvbuf(stderr, NULL, _IONBF, 0);
 
-  // Clock to USART1
-  RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
-  // Clock to GPIOA
-  RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
-  // PA9 and PA10 to AF
-  GPIOA->MODER |= GPIO_MODER_MODER9_1;
-  GPIOA->MODER |= GPIO_MODER_MODER10_1;
-  // Remap to correct AF
-  GPIOA->AFR[1] |= (1 << (1*4)); // Remap pin 9 to AF1
-  GPIOA->AFR[1] |= (1 << (2*4)); // Remap pin 10 to AF1
+  // Clocks to USART1 and GPIOA
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+
+  // PA9 and PA10 to AF1
+  GPIO_InitTypeDef GPIOAUSART1InitStruct;
+  GPIO_StructInit(&GPIOAUSART1InitStruct);
+  GPIOAUSART1InitStruct.GPIO_Mode = GPIO_Mode_AF;
+  GPIOAUSART1InitStruct.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10;
+  GPIOAUSART1InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_Init(GPIOA, &GPIOAUSART1InitStruct);
+
+  GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_1);
+  GPIO_PinAFConfig(GPIOA, GPIO_PinSource10, GPIO_AF_1);
 
   // BRR = fclk / baud = fclk / 115200
   SystemCoreClockUpdate();
-  USART1->BRR = SystemCoreClock/115200;
-  USART1->CR1 |= USART_CR1_RE; // Receive enable
-  USART1->CR1 |= USART_CR1_RXNEIE; // Receive not empty interrupt enable
-  USART1->CR1 |= USART_CR1_TE; // Transmit enable
-  USART1->CR1 |= USART_CR1_UE; // USART enable
+  USART_InitTypeDef USART1InitStruct;
+  USART_StructInit(&USART1InitStruct);
+  USART1InitStruct.USART_BaudRate = 115200; // Set the baud
+  USART1InitStruct.USART_WordLength = USART_WordLength_8b;
+  USART1InitStruct.USART_StopBits = USART_StopBits_1;
+  USART1InitStruct.USART_Mode = USART_Mode_Tx | USART_Mode_Rx; // Transmit and receive enable
+  USART_Init(USART1, &USART1InitStruct);
 
-  NVIC_EnableIRQ(USART1_IRQn); // Enable interrupt on USART
+  USART_ITConfig(USART1, USART_IT_RXNE, ENABLE); // Enable "receive not empty" interrupt config
+  USART_Cmd(USART1, ENABLE);
+
+  NVIC_EnableIRQ(USART1_IRQn); // Enable interrupt on USART1
 }
 
 void USART1_IRQHandler(void) {
@@ -65,7 +79,7 @@ void USART1_IRQHandler(void) {
   }
   // Check for impending overrun
   if (buffer_pointer >= BUFFER_SIZE) {
-    printf("ERROR 3: buffer overrun\r\n");
+    srl_sendData("ERROR 3: buffer overrun\r\n");
     buffer_pointer = 0;
     write(0, "> ", 2);  // Ready for next command
   }
@@ -101,7 +115,7 @@ void srl_sendData(const char* format, ...) {
   vsnprintf(buf, n+1, format, va); // Formulate
   va_end(va);
 
-  _writeUSART2(buf, n); // Write the string to USART2
+  _writeUSART1(buf, n); // Write the string to USART1
 
   // Cleanup
   free(buf);
