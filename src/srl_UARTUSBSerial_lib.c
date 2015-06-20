@@ -1,13 +1,11 @@
 // == Includes ==
-#include "wfi_uartESP8266Wifi_lib.h"
-#include "lcd_stm32f0.h"
+#include "srl_UARTUSBSerial_lib.h"
 #include <string.h>
 #include <stdio.h>
 #include "stdarg.h"
 #include "assert.h"
 #include "stdlib.h"
 #include <unistd.h>
-#include "diag/Trace.h" // For TRACE output support
 
 // == Defines ==
 #define BUFFER_SIZE 64
@@ -15,7 +13,7 @@
 // == Static Function Prototypes ==
 static uint32_t processInput(uint8_t *rx_buffer);
 
-void wfi_ESP8266UARTInit(void) {
+void srl_UARTUSBSerialInit(void) {
   // Disable buffering to prevent having to send a newline to flush
   setvbuf(stdin, NULL, _IONBF, 0);
   setvbuf(stdout, NULL, _IONBF, 0);
@@ -43,12 +41,12 @@ void wfi_ESP8266UARTInit(void) {
   NVIC_EnableIRQ(USART1_IRQn); // Enable interrupt on USART
 }
 
-void USART2_IRQHandler(void) {
+void USART1_IRQHandler(void) {
   static uint8_t rx_buffer[BUFFER_SIZE];
   static uint32_t buffer_pointer = 0;
 
   // Acknowledge the interrupt by reading the received data
-  uint8_t received_char = USART2->RDR;
+  uint8_t received_char = USART1->RDR;
   write(0, &received_char, 1);
   if (received_char == '\r') { // "Enter"
     write(0, "\n", 1);
@@ -91,7 +89,7 @@ static uint32_t processInput(uint8_t *rx_buffer) {
   return 0;
 }
 
-void wfi_sendData(const char* format, ...) {
+void srl_sendData(const char* format, ...) {
   // Make use of the format list (variable arguments) to formulate the formatted string
   va_list va;
   va_start(va, format);

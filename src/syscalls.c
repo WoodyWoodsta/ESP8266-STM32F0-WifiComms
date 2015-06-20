@@ -27,26 +27,41 @@ int _lseek(int file, int ptr, int dir) {
 
 int _read(int file, char *buf, int len) {
   int i = 0;
-  while(i < len) {
-    while((USART1->ISR & USART_ISR_RXNE) == 0); // hange while receive IS empty
+  while (i < len) {
+    while ((USART1->ISR & USART_ISR_RXNE) == 0)
+      ; // hang while receive IS empty
     buf[i++] = USART1->RDR;
     //_write(0, &buf[i-1], 1);
-    printf("%X", buf[i-1]);
+    printf("%X", buf[i - 1]);
   }
   return len;
 }
 
+int _write(int file, char *buf, int nbytes) {
+  return 0;
+}
 
-int _write(int file, const char *ptr, int len) {
+int _writeUSART1(const char *ptr, int len) {
   int todo;
 
   for (todo = 0; todo < len; todo++) {
-    while((USART1->ISR & USART_ISR_TXE) == 0); // hang while trasnmit not empty
+    while ((USART1->ISR & USART_ISR_TXE) == 0)
+      ; // hang while transmit not empty
     USART1->TDR = (*ptr++);
   }
   return len;
 }
 
+int _writeUSART2(const char *ptr, int len) {
+  int todo;
+
+  for (todo = 0; todo < len; todo++) {
+    while ((USART2->ISR & USART_ISR_TXE) == 0)
+      ; // hang while transmit not empty
+    USART2->TDR = (*ptr++);
+  }
+  return len;
+}
 
 // We already have this
 //void *_sbrk(int incr) {
