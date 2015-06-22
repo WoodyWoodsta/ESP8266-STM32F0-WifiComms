@@ -76,7 +76,9 @@ $RECYCLE.BIN/
 *.lnk
 
 ### Eclipse Extra Things
-
+.settings/
+.cproject
+.project
 /Debug/
 /Release/
 /ldscripts/
