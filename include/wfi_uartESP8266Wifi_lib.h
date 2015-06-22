@@ -16,7 +16,7 @@
 #endif
 
 // == Globals ==
-char *wfi_Buffer; // Buffered string for data from wifi
+char *wfi_buffer; // Buffered string for data from wifi
 
 // == Declarations ==
 void wfi_ESP8266UARTInit(void);

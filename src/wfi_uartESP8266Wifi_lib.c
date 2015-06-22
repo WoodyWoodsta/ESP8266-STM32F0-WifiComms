@@ -42,7 +42,7 @@ void wfi_ESP8266UARTInit(void) {
   SystemCoreClockUpdate();
   USART_InitTypeDef USART2InitStruct;
   USART_StructInit(&USART2InitStruct);
-  USART2InitStruct.USART_BaudRate = 9600; // Set the baud
+  USART2InitStruct.USART_BaudRate = 115200; // Set the baud
   USART2InitStruct.USART_WordLength = USART_WordLength_8b;
   USART2InitStruct.USART_StopBits = USART_StopBits_1;
   USART2InitStruct.USART_Mode = USART_Mode_Tx | USART_Mode_Rx; // Transmit and receive enable
@@ -57,9 +57,11 @@ void wfi_ESP8266UARTInit(void) {
 void USART2_IRQHandler(void) {
   static uint8_t rx_buffer[BUFFER_SIZE];
   static uint32_t buffer_pointer = 0;
+  uint8_t crReceived = FALSE;
+  uint8_t lfRecieved = FALSE;
   uint8_t dirtyByte = FALSE;
 
-  // Check for and clear other interrupts
+  // Check for and clear other interrupts TODO: Make this less expensive
   ITStatus USART2OREFlag = USART_GetFlagStatus(USART2, USART_FLAG_ORE);
   ITStatus USART2FEFlag = USART_GetFlagStatus(USART2, USART_FLAG_FE);
   ITStatus USART2OREStatus = USART_GetITStatus(USART2, USART_IT_ORE);
@@ -80,8 +82,32 @@ void USART2_IRQHandler(void) {
 
   // Acknowledge the interrupt by reading the received data
   uint8_t received_char = USART2->RDR;
-  if (!dirtyByte) { // Chuck away any junk (noise, it must be)
-    srl_sendData("%c", received_char);
+//  srl_sendData("%c", received_char);
+
+  if (received_char == '\r') {
+    crReceived = TRUE;
+  } else if (received_char == '\n') {
+    lfRecieved = TRUE;
+  }
+
+//  if (!dirtyByte) {
+    if (!crReceived && !lfRecieved) { // Chuck away any junk (noise, it must be)
+      rx_buffer[buffer_pointer++] = received_char;
+    } else if (buffer_pointer != 0) { // Only if there is something in the rx_buffer, terminate and send
+      rx_buffer[buffer_pointer++] = (char) 0; // Finalize the string by terminating it with a 0
+      if (!wfi_buffer) { // If there is nothing in the buffer
+        wfi_buffer = malloc(buffer_pointer); // Prep the memory
+        memcpy(wfi_buffer, rx_buffer, buffer_pointer); // Copy across the buffer
+        buffer_pointer = 0; // Ready to buffer fresh string
+      }
+    }
+//  }
+
+  // Check for impending overrun
+  if (buffer_pointer >= BUFFER_SIZE) {
+    srl_sendData("ERROR 3: buffer overrun\r\n");
+    buffer_pointer = 0;
+    exit(1); // Kill the app if this occurs
   }
 
 //  if (received_char == '\r') { // "Enter"
@@ -91,33 +117,13 @@ void USART2_IRQHandler(void) {
 //  } else { // New char arrived. Add it to the buffer
 //    rx_buffer[buffer_pointer++] = (uint8_t)received_char;
 //  }
+
 //  // Check for impending overrun
 //  if (buffer_pointer >= BUFFER_SIZE) {
 //    srl_sendData("ERROR 3: buffer overrun\r\n");
 //    buffer_pointer = 0;
 //  }
 
-//  static uint8_t rx_buffer[BUFFER_SIZE];
-//  static uint32_t buffer_pointer = 0;
-//
-//  rx_buffer[buffer_pointer++] = received_char;
-//
-//  if (received_char == '\n') { // "Line feed"
-//    rx_buffer[buffer_pointer] = 0; // Finalize the string by terminating it with a 0
-//    if (!wfi_Buffer) { // If there is nothing in the buffer
-//      wfi_Buffer = malloc(buffer_pointer+1); // Prep the memory
-//      memcpy(wfi_Buffer, rx_buffer, buffer_pointer+1); // Copy across the buffer
-//      *(wfi_Buffer + buffer_pointer + 1) = (char) 0; // Append null character to signify end of buffer
-//      buffer_pointer = 0; // Ready to buffer fresh string
-//    }
-//  }
-//
-//  // Check for impending overrun
-//  if (buffer_pointer >= BUFFER_SIZE) {
-//    srl_sendData("ERROR 3: buffer overrun\r\n");
-//    buffer_pointer = 0;
-//    exit(1); // Kill the app if this occurs
-//  }
 }
 
 static uint32_t processInput(uint8_t *rx_buffer) {
