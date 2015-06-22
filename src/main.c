@@ -1,24 +1,23 @@
-
 #include "stm32f0xx.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "diag/Trace.h"
 
+#include "wfi_uartESP8266Wifi_lib.h"
+#include "srl_UARTUSBSerial_lib.h"
+
 int main(int argc, char* argv[]) {
 
   wfi_ESP8266UARTInit();
   srl_UARTUSBSerialInit();
-  lcd_init();
-
   int i = 0;
-  int j = 0;
-  int8_t testInt = 125;
-  int8_t testInt2 = 3;
+
+  srl_sendData("\rStartup complete!\r\n");
+
   while (1) {
-    srl_sendData("Hello World - %i\r\n", j);
-    for(i = 0; i < 10000000; i++);
-    j++;
+    __WFI();
   }
+
 }
 
 #pragma GCC diagnostic pop

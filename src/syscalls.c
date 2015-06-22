@@ -26,15 +26,7 @@ int _lseek(int file, int ptr, int dir) {
 }
 
 int _read(int file, char *buf, int len) {
-  int i = 0;
-  while (i < len) {
-    while ((USART1->ISR & USART_ISR_RXNE) == 0)
-      ; // hang while receive IS empty
-    buf[i++] = USART1->RDR;
-    //_write(0, &buf[i-1], 1);
-    printf("%X", buf[i - 1]);
-  }
-  return len;
+  return 0;
 }
 
 int _write(int file, char *buf, int nbytes) {

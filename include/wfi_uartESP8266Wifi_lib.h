@@ -8,6 +8,15 @@
 
 // == Defines ==
 #define STM32F051
+#ifndef TRUE
+  #define TRUE 1
+#endif
+#ifndef FALSE
+  #define FALSE 0
+#endif
+
+// == Globals ==
+char *wfi_Buffer; // Buffered string for data from wifi
 
 // == Declarations ==
 void wfi_ESP8266UARTInit(void);
