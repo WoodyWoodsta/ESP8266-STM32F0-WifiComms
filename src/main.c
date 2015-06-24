@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
     // If there is data in the global buffer, push it out and clear the buffer
     if(wfi_buffer) {
       srl_sendData("Wifi: %s\r\n", wfi_buffer);
-      if(strcmp(wfi_buffer, "+IPD,0,1:1") == 0) {
+      if(strcmp(wfi_buffer, "+IPD,9,1:LEDs ON") == 0) {
         GPIO_SetBits(GPIOB, GPIO_Pin_0 |
                             GPIO_Pin_1 |
                             GPIO_Pin_2 |
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
                             GPIO_Pin_5 |
                             GPIO_Pin_6 |
                             GPIO_Pin_7);
-      } else if (strcmp(wfi_buffer, "+IPD,0,1:0") == 0) {
+      } else if (strcmp(wfi_buffer, "+IPD,0,10:LEDs OFF") == 0) {
         GPIO_ResetBits(GPIOB, GPIO_Pin_0 |
                             GPIO_Pin_1 |
                             GPIO_Pin_2 |

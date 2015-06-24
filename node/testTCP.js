@@ -7,10 +7,15 @@ var net = require('net'); // Load up the required library for TCP stuff
 
 // Create a new TCP socket 
 var client = new net.Socket(); 
-client.connect(8080, '192.168.1.189', function() { // Connect to the chip
+client.connect(1337, '192.168.1.189', function() { // Connect to the chip
   console.log('Connected');
-  client.write('Hello, server! Love, Client.\r\n'); // Send some text
-  client.write('This is really really cool!\r\n') // Send some more text
+  client.write('Hello, server! Love, Client. This is a really long stringHello, server! Love, Client. This is a really long stringHello, server! Love, Client. This is a really long stringHello, server! Love, Client. This is a really long stringHello, server! Love, Client. This is a really long string'); // Send some text
+  // client.write('This is really really cool!\r\n') // Send some more text
+  // console.log('Test string sent');
+  // client.write('LEDs ON\r\n');
+  // console.log('LEDs On command sent');
+  // client.write('LEDs OFF\r\n');
+  // console.log('LEDs Off command sent');
 });
  
 // When data is recieved, call "data()"
@@ -24,5 +29,5 @@ client.on('close', function() {
 // Callback upon receiving data from the server
 function data(data) {
   console.log('Received: ' + data);
-  client.destroy(); // kill client after server's response
+  // client.destroy(); // kill client after server's response
 }

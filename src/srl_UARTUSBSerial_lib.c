@@ -44,7 +44,7 @@ void srl_UARTUSBSerialInit(void) {
   SystemCoreClockUpdate();
   USART_InitTypeDef USART1InitStruct;
   USART_StructInit(&USART1InitStruct);
-  USART1InitStruct.USART_BaudRate = 115200; // Set the baud
+  USART1InitStruct.USART_BaudRate = 921600; // Set the baud (Maximum)
   USART1InitStruct.USART_WordLength = USART_WordLength_8b;
   USART1InitStruct.USART_StopBits = USART_StopBits_1;
   USART1InitStruct.USART_Mode = USART_Mode_Tx | USART_Mode_Rx; // Transmit and receive enable
