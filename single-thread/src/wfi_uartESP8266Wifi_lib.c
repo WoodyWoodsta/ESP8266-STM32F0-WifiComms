@@ -151,4 +151,3 @@ void wfi_sendData(const char* format, ...) {
   // Cleanup
   free(buf);
 }
-
