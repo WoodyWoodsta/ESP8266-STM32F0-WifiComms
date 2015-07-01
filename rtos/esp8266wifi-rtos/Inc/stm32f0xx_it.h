@@ -31,24 +31,24 @@
   ******************************************************************************
   */
 
-/* Define to prevent recursive inclusion -------------------------------------*/
+  /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __STM32F0xx_IT_H
 #define __STM32F0xx_IT_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif 
 
-/* Includes ------------------------------------------------------------------*/
-/* Exported types ------------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-/* Exported macro ------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
+  /* Includes ------------------------------------------------------------------*/
+  /* Exported types ------------------------------------------------------------*/
+  /* Exported constants --------------------------------------------------------*/
+  /* Exported macro ------------------------------------------------------------*/
+  /* Exported functions ------------------------------------------------------- */
 
-void SysTick_Handler(void);
-void DMA1_Channel2_3_IRQHandler(void);
-void DMA1_Channel4_5_IRQHandler(void);
-void USART1_IRQHandler(void);
+  void SysTick_Handler(void);
+  void DMA1_Channel2_3_IRQHandler(void);
+  void DMA1_Channel4_5_IRQHandler(void);
+  void USART1_IRQHandler(void);
 
 #ifdef __cplusplus
 }

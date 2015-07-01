@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\FreeRTOSConfig.h" />
+    <ClInclude Include="Inc\hal_lib.h" />
     <ClInclude Include="Inc\stm32f0xx_hal_conf.h" />
     <ClInclude Include="Inc\stm32f0xx_it.h" />
     <ClInclude Include="Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Include\stm32f030x6.h" />
@@ -158,6 +159,7 @@
     <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\tasks.c" />
     <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\timers.c" />
     <ClCompile Include="Src\freertos.c" />
+    <ClCompile Include="Src\hal_lib.c" />
     <ClCompile Include="Src\main.c" />
     <ClCompile Include="Src\stm32f0xx_hal_msp.c" />
     <ClCompile Include="Src\stm32f0xx_it.c" />

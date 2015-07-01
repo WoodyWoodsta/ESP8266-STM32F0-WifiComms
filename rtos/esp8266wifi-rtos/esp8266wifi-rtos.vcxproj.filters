@@ -358,6 +358,9 @@
     <ClInclude Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM0\portmacro.h">
       <Filter>Header files\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM0</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\hal_lib.h">
+      <Filter>Header files\Inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Source\Templates\system_stm32f0xx.c">
@@ -440,6 +443,9 @@
     </ClCompile>
     <ClCompile Include="Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Source\Templates\startup_stm32f0xx.c">
       <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\hal_lib.c">
+      <Filter>Source files\Src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
