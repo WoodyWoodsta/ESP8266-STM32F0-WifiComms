@@ -72,6 +72,7 @@
     <ClInclude Include="Inc\hal_lib.h" />
     <ClInclude Include="Inc\stm32f0xx_hal_conf.h" />
     <ClInclude Include="Inc\stm32f0xx_it.h" />
+    <ClInclude Include="Inc\userTasks_task.h" />
     <ClInclude Include="Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Include\stm32f030x6.h" />
     <ClInclude Include="Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Include\stm32f030x8.h" />
     <ClInclude Include="Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Include\stm32f030xc.h" />
@@ -135,6 +136,7 @@
     <ClInclude Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM0\portmacro.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\defaultTask_task.c" />
     <ClCompile Include="Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Source\Templates\startup_stm32f0xx.c" />
     <ClCompile Include="Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Source\Templates\system_stm32f0xx.c" />
     <ClCompile Include="Lib\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_hal.c" />
@@ -163,6 +165,9 @@
     <ClCompile Include="Src\main.c" />
     <ClCompile Include="Src\stm32f0xx_hal_msp.c" />
     <ClCompile Include="Src\stm32f0xx_it.c" />
+    <ClCompile Include="Src\USARTInTask_task.c" />
+    <ClCompile Include="Src\USARTOutTask_task.c" />
+    <ClCompile Include="Src\userTasks_task.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

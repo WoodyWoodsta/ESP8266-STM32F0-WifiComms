@@ -361,6 +361,9 @@
     <ClInclude Include="Inc\hal_lib.h">
       <Filter>Header files\Inc</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\userTasks_task.h">
+      <Filter>Header files\Inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Source\Templates\system_stm32f0xx.c">
@@ -432,9 +435,6 @@
     <ClCompile Include="Src\freertos.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Src\main.c">
-      <Filter>Source files\Src</Filter>
-    </ClCompile>
     <ClCompile Include="Src\stm32f0xx_hal_msp.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
@@ -445,6 +445,21 @@
       <Filter>Source files</Filter>
     </ClCompile>
     <ClCompile Include="Src\hal_lib.c">
+      <Filter>Source files\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\main.c">
+      <Filter>Source files\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\defaultTask_task.c">
+      <Filter>Source files\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\USARTInTask_task.c">
+      <Filter>Source files\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\USARTOutTask_task.c">
+      <Filter>Source files\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\userTasks_task.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
   </ItemGroup>

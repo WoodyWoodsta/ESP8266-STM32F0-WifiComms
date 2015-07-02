@@ -34,13 +34,11 @@
   /* Includes ------------------------------------------------------------------*/
 #include "hal_lib.h"
 #include "cmsis_os.h"
+#include "userTasks_task.h"
 
 /* Private variables ---------------------------------------------------------*/
 
-osThreadId defaultTaskHandle;
-
 /* Private function prototypes -----------------------------------------------*/
-void StartDefaultTask(void const * argument);
 
 int main(void) {
 
@@ -71,9 +69,14 @@ int main(void) {
   /* USER CODE END RTOS_TIMERS */
 
   /* Create the thread(s) */
-  /* definition and creation of defaultTask */
   osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+
+  osThreadDef(USARTInTask, StartUSARTInTask, osPriorityNormal, 0, 128);
+  USARTInTaskHandle = osThreadCreate(osThread(USARTInTask), NULL);
+
+  osThreadDef(USARTOutTask, StartUSARTOutTask, osPriorityNormal, 0, 128);
+  USARTOutTaskHandle = osThreadCreate(osThread(USARTOutTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -94,15 +97,6 @@ int main(void) {
 
 }
 
-
-/* StartDefaultTask function */
-void StartDefaultTask(void const * argument) {
-
-  /* Infinite loop */
-  for (;;) {
-    osDelay(1);
-  }
-}
 
 #ifdef USE_FULL_ASSERT
 
