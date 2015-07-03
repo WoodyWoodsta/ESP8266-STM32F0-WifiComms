@@ -26,6 +26,6 @@ LINUX_PACKAGES +=
 CFLAGS += -mcpu=cortex-m0 -mthumb
 CXXFLAGS += -mcpu=cortex-m0 -mthumb
 ASFLAGS += -mcpu=cortex-m0 -mthumb
-LDFLAGS += -mcpu=cortex-m0 -mthumb -T$(BSP_ROOT)/STM32F0xxxx/LinkerScripts/STM32F051x6_flash.lds --specs=nano.specs --specs=nosys.specs
+LDFLAGS += -mcpu=cortex-m0 -mthumb -T$(BSP_ROOT)/STM32F0xxxx/LinkerScripts/STM32F051C6_flash.lds --specs=nano.specs --specs=nosys.specs
 COMMONFLAGS += 
 
