@@ -7,6 +7,7 @@ void StartUSARTOutTask(void const * argument) {
 
   /* Infinite loop */
   for (;;) {
-    osDelay(1);
+    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_6);
+    osDelay(350);
   }
 }

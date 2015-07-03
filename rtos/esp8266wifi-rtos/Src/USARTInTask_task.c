@@ -7,6 +7,7 @@ void StartUSARTInTask(void const * argument) {
 
   /* Infinite loop */
   for (;;) {
-    osDelay(1);
+    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_1);
+    osDelay(150);
   }
 }

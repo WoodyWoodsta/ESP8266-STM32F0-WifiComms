@@ -43,7 +43,7 @@ void SystemClock_Config(void) {
 void MX_USART1_UART_Init(void) {
 
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 921600;
+  huart1.Init.BaudRate = 115200;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
@@ -177,6 +177,7 @@ HAL_StatusTypeDef cHAL_UART_TermReceive_IT(UART_HandleTypeDef *huart, uint8_t *p
 * @retval None
 */
 void cHAL_UART_IRQTermHandler(UART_HandleTypeDef *huart) {
+  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2 | GPIO_PIN_3);
   /* UART parity error interrupt occurred -------------------------------------*/
   if ((__HAL_UART_GET_IT(huart, UART_IT_PE) != RESET) && (__HAL_UART_GET_IT_SOURCE(huart, UART_IT_PE) != RESET)) {
     __HAL_UART_CLEAR_IT(huart, UART_CLEAR_PEF);
@@ -230,7 +231,7 @@ void cHAL_UART_IRQTermHandler(UART_HandleTypeDef *huart) {
 
   /* UART in mode Receiver ---------------------------------------------------*/
   if ((__HAL_UART_GET_IT(huart, UART_IT_RXNE) != RESET) && (__HAL_UART_GET_IT_SOURCE(huart, UART_IT_RXNE) != RESET)) {
-    cUART_TermReceive_IT(huart);
+    HAL_StatusTypeDef status = cUART_TermReceive_IT(huart);
     /* Clear RXNE interrupt flag */
     __HAL_UART_SEND_REQ(huart, UART_RXDATA_FLUSH_REQUEST);
   }
@@ -245,6 +246,8 @@ void cHAL_UART_IRQTermHandler(UART_HandleTypeDef *huart) {
   //if ((__HAL_UART_GET_IT(huart, UART_IT_TC) != RESET) && (__HAL_UART_GET_IT_SOURCE(huart, UART_IT_TC) != RESET)) {
   //  UART_EndTransmit_IT(huart);
   //}
+  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2 | GPIO_PIN_3);
+
 }
 
 /**
@@ -259,7 +262,7 @@ HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
   uint16_t uhMask = huart->Mask;
   uint16_t RxXferCount = huart->RxXferCount;
 
-  if ((huart->State == HAL_UART_STATE_BUSY_RX) || (huart->State == HAL_UART_STATE_BUSY_TX_RX)) {
+  if ((huart->State == HAL_UART_STATE_BUSY_RX) || (huart->State == HAL_UART_STATE_BUSY_TX_RX) || (huart->State == HAL_UART_STATE_READY)) {
 
     uint8_t inChar = (uint8_t) (huart->Instance->RDR & (uint8_t) uhMask);
     
@@ -285,3 +288,6 @@ HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
   }
 }
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+  HAL_StatusTypeDef status = HAL_UART_Transmit_DMA(huart, huart->pRxBuffPtr, huart->RxXferCount);
+}

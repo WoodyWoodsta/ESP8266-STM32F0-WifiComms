@@ -66,6 +66,7 @@
     <None Include="debug.mak" />
     <None Include="Makefile" />
     <None Include="release.mak" />
+    <None Include="stm32.mak" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\FreeRTOSConfig.h" />

@@ -164,6 +164,7 @@
     <None Include="release.mak">
       <Filter>Make files</Filter>
     </None>
+    <None Include="stm32.mak" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Include\stm32f030x6.h">
