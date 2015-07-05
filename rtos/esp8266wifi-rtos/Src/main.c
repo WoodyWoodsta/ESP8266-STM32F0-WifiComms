@@ -1,8 +1,10 @@
 /**
-  ******************************************************************************
+  * ============================================================================
   * File Name          : main.c
   * Description        : Main program body
-  ******************************************************************************
+  * ============================================================================
+  *
+  * Modified by Team 13
   *
   * COPYRIGHT(c) 2015 STMicroelectronics
   *
@@ -28,18 +30,29 @@
   * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
-  ******************************************************************************
+  * ============================================================================
   */
 
-  /* Includes ------------------------------------------------------------------*/
+// == Includes ==
 #include "hal_lib.h"
 #include "cmsis_os.h"
 #include "userTasks_task.h"
 
-/* Private variables ---------------------------------------------------------*/
+// == Message Pools and Queues ==
+// USART In Task String Queue
+osPoolDef(msgPoolUSARTIn, 5, msg_StringMessage_t);
+osMessageQDef(msgQUSARTIn, 5, msg_StringMessage_t);
 
-/* Private function prototypes -----------------------------------------------*/
+// USART Out Task String Queue
+osPoolDef(msgPoolUSARTOut, 2, msg_StringMessage_t);
+osMessageQDef(msgQUSARTOut, 2, msg_StringMessage_t);
 
+// Boss Task Command Queue
+osPoolDef(msgPoolBoss, 5, msg_CommandMessage_t);
+osMessageQDef(msgQBoss, 5, msg_CommandMessage_t);
+
+
+// == Function Definitions ==
 int main(void) {
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -69,8 +82,8 @@ int main(void) {
   /* USER CODE END RTOS_TIMERS */
 
   /* Create the thread(s) */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+  osThreadDef(bossTask, StartBossTask, osPriorityNormal, 0, 128);
+  bossTaskHandle = osThreadCreate(osThread(bossTask), NULL);
 
   osThreadDef(USARTInTask, StartUSARTInTask, osPriorityNormal, 0, 128);
   USARTInTaskHandle = osThreadCreate(osThread(USARTInTask), NULL);
@@ -78,12 +91,19 @@ int main(void) {
   osThreadDef(USARTOutTask, StartUSARTOutTask, osPriorityNormal, 0, 128);
   USARTOutTaskHandle = osThreadCreate(osThread(USARTOutTask), NULL);
 
-  /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
-  /* USER CODE END RTOS_THREADS */
-
   /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
+  // USART In Task String Queue
+  msgPoolUSARTIn = osPoolCreate(osPool(msgPoolUSARTIn));
+  msgQUSARTIn = osMessageCreate(osMessageQ(msgQUSARTIn), NULL);
+  
+  // USART Out Task String Queue
+  msgPoolUSARTOut = osPoolCreate(osPool(msgPoolUSARTOut));
+  msgQUSARTOut = osMessageCreate(osMessageQ(msgQUSARTOut), NULL);
+
+  // Boss Task Command Queue
+  msgPoolBoss = osPoolCreate(osPool(msgPoolBoss));
+  msgQBoss = osMessageCreate(osMessageQ(msgQBoss), NULL);
+  
   /* USER CODE END RTOS_QUEUES */
 
   /* Start scheduler */

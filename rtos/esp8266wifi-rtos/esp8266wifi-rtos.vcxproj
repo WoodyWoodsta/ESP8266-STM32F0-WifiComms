@@ -137,7 +137,7 @@
     <ClInclude Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM0\portmacro.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\defaultTask_task.c" />
+    <ClCompile Include="Src\bossTask_task.c" />
     <ClCompile Include="Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Source\Templates\startup_stm32f0xx.c" />
     <ClCompile Include="Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Source\Templates\system_stm32f0xx.c" />
     <ClCompile Include="Lib\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_hal.c" />

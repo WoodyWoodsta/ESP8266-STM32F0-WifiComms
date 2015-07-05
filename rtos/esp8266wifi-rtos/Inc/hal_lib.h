@@ -1,3 +1,10 @@
+/**
+  * ============================================================================
+  * File Name          : hal_lib.h
+  * Description        : Custom Hardware Abstraction header file
+  * ============================================================================
+  */
+
 #ifndef HAL_LIB_H
 #define HAL_LIB_H
 

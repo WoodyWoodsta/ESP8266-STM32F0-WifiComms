@@ -451,9 +451,6 @@
     <ClCompile Include="Src\main.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Src\defaultTask_task.c">
-      <Filter>Source files\Src</Filter>
-    </ClCompile>
     <ClCompile Include="Src\USARTInTask_task.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
@@ -461,6 +458,9 @@
       <Filter>Source files\Src</Filter>
     </ClCompile>
     <ClCompile Include="Src\userTasks_task.c">
+      <Filter>Source files\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\bossTask_task.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
   </ItemGroup>
