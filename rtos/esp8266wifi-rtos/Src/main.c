@@ -44,8 +44,8 @@ osPoolDef(msgPoolUSARTIn, 5, msg_StringMessage_t);
 osMessageQDef(msgQUSARTIn, 5, msg_StringMessage_t);
 
 // USART Out Task String Queue
-osPoolDef(msgPoolUSARTOut, 2, msg_StringMessage_t);
-osMessageQDef(msgQUSARTOut, 2, msg_StringMessage_t);
+osPoolDef(msgPoolUSARTOut, 2, msg_CommandMessage_t);
+osMessageQDef(msgQUSARTOut, 2, msg_CommandMessage_t);
 
 // Boss Task Command Queue
 osPoolDef(msgPoolBoss, 5, msg_CommandMessage_t);

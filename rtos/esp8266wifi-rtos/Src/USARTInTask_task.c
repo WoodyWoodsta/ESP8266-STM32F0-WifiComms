@@ -9,47 +9,82 @@
 #include "userTasks_task.h"
 
 // == Function Definitions ==
-
 /**
 * @brief USARTInTask
 * @param argument
 */
 void StartUSARTInTask(void const * argument) {
-  msg_StringMessage_t *msgRxPtr;
+  msg_StringMessage_t *msgStringRxPtr;
+  msg_CommandMessage_t *msgCommandTxPtr;
   osEvent msgRxEvent;
+  char *directInBuff;
+  char *directOutBuff;
+
+  directInBuff = pvPortMalloc(100);
+  directOutBuff = pvPortMalloc(100);
+
+  // Strings to send
+  const char commStateManualTxString[] = "MANUAL Mode Started\r\n";
+  const char commStateAutoTxString[] = "AUTO Mode Started\r\n";
+
+  // Strings to compare with
+  const char led0ToggleRxString[] = "Toggle LED0";
+  const char commStateManualRxString[] = "MANUAL";
+  const char commStateAutoRxString[] = "AUTO";
+  const char testATRxString[] = "Test AT";
 
   /* Infinite loop */
   for (;;) {
-    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_6);
     msgRxEvent = osMessageGet(msgQUSARTIn, osWaitForever); // Wait for a message
 
     // If there is a message in the queue
     if (msgRxEvent.status == osEventMessage) {
-      msgRxPtr = msgRxEvent.value.p; // Grab the pointer
+      msgStringRxPtr = msgRxEvent.value.p; // Grab the pointer
 
-      const char led0ToggleString[] = "Toggle LED0";
-      const char led1ToggleString[] = "Toggle LED1";
-      const char led2ToggleString[] = "Toggle LED2";
-      // If this has come to the correct place (might be a bit redundant)
-      if (msgRxPtr->messageDestination == MSG_DEST_USART_IN) {
-        // If the command is the expected length and correct, do the thing!
-        if ((msgRxPtr->messageLength == (sizeof(led0ToggleString) - 1))
-            && (strncmp(msgRxPtr->string, led0ToggleString, msgRxPtr->messageLength) == 0)) {
-          HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
-        } else if ((msgRxPtr->messageLength == (sizeof(led1ToggleString) - 1))
-                   && (strncmp(msgRxPtr->string, led1ToggleString, msgRxPtr->messageLength) == 0)) {
-          HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_1);
-        } else if ((msgRxPtr->messageLength == (sizeof(led2ToggleString) - 1))
-                   && (strncmp(msgRxPtr->string, led2ToggleString, msgRxPtr->messageLength) == 0)) {
-          HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
+      // If the message is from the USB port
+      if (msgStringRxPtr->messageSource == MSG_SRC_USB) {
+        // If the current routing is to INTERPRET (i.e. if this task must handle input commands)
+        if (wifiCommState == COMM_STATE_AUTO) {
+          // If the command is the expected length and correct, do the thing!
+          if ((msgStringRxPtr->messageLength == (sizeof(testATRxString) - 1))
+              && (strncmp(msgStringRxPtr->string, testATRxString, msgStringRxPtr->messageLength) == 0)) {
+            // Send the "Send AT" command to USART Out Task
+            msgCommandSend(msgPoolUSARTOut, msgQUSARTOut, msgCommandTxPtr, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_SEND_AT);
+          } else if ((msgStringRxPtr->messageLength == (sizeof(led0ToggleRxString) - 1))
+                     && (strncmp(msgStringRxPtr->string, led0ToggleRxString, msgStringRxPtr->messageLength) == 0)) {
+            HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
+          } else if ((msgStringRxPtr->messageLength == (sizeof(commStateManualRxString) - 1))
+                     && (strncmp(msgStringRxPtr->string, commStateManualRxString, msgStringRxPtr->messageLength) == 0)) {
+            wifiCommState = COMM_STATE_MANUAL;
+            HAL_UART_Transmit_DMA(&huart1, commStateManualTxString, sizeof(commStateManualTxString) - 1);
+          }
+        } else if (wifiCommState == COMM_STATE_MANUAL) {
+          if ((msgStringRxPtr->messageLength == (sizeof(commStateAutoRxString) - 1))
+              && (strncmp(msgStringRxPtr->string, commStateAutoRxString, msgStringRxPtr->messageLength) == 0)) {
+            wifiCommState = COMM_STATE_AUTO;
+            HAL_UART_Transmit_DMA(&huart1, commStateAutoTxString, sizeof(commStateManualTxString) - 1);
+          } else {
+            memcpy(directInBuff, msgStringRxPtr->string, msgStringRxPtr->messageLength);
+
+            // Not sure if this is the right (or at least best) way to do this
+            directInBuff[msgStringRxPtr->messageLength] = '\r';
+            directInBuff[msgStringRxPtr->messageLength + 1] = '\n';
+
+            HAL_UART_Transmit_DMA(&huart2, directInBuff, msgStringRxPtr->messageLength + 2);
+          }
         }
+      } else if ((msgStringRxPtr->messageSource == MSG_SRC_WIFI) && (wifiCommState == COMM_STATE_MANUAL)) {
+        // Echo wifi module
+        memcpy(directOutBuff, msgStringRxPtr->string, msgStringRxPtr->messageLength);
+
+        directOutBuff[msgStringRxPtr->messageLength] = '\r';
+        directOutBuff[msgStringRxPtr->messageLength + 1] = '\n';
+
+        HAL_UART_Transmit_DMA(&huart1, directOutBuff, msgStringRxPtr->messageLength + 2);
       }
 
       // Free the message
-      msgStringStructFree(msgPoolUSARTIn, msgRxPtr);
+      msgStringStructFree(msgPoolUSARTIn, msgStringRxPtr);
     }
-
-    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_6);
-    osDelay(1);
   }
 }
