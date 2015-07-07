@@ -166,7 +166,8 @@ HAL_StatusTypeDef cHAL_UART_TermReceive_IT(UART_HandleTypeDef *huart, uint8_t *p
     /* Check if a transmit process is ongoing or not */
     if (huart->State == HAL_UART_STATE_BUSY_TX) {
       huart->State = HAL_UART_STATE_BUSY_TX_RX;
-    } else {
+    }
+    else {
       huart->State = HAL_UART_STATE_BUSY_RX;
     }
 
@@ -183,7 +184,8 @@ HAL_StatusTypeDef cHAL_UART_TermReceive_IT(UART_HandleTypeDef *huart, uint8_t *p
     __HAL_UART_ENABLE_IT(huart, UART_IT_RXNE);
 
     return HAL_OK;
-  } else {
+  }
+  else {
     return HAL_BUSY;
   }
 }
@@ -281,7 +283,7 @@ HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
 
   if ((huart->State == HAL_UART_STATE_BUSY_RX) || (huart->State == HAL_UART_STATE_BUSY_TX_RX) || (huart->State == HAL_UART_STATE_READY)) {
 
-    uint8_t inChar = (uint8_t) (huart->Instance->RDR & (uint8_t) uhMask);
+    uint8_t inChar = (uint8_t)(huart->Instance->RDR & (uint8_t) uhMask);
 
     // If we have reached a <cr>, <lf> or NULL, or if we have reached the end of the buffer, send off a completed string
     if ((inChar == 0x0D) || (inChar == 0x0A) || (inChar == 0x00) || (RxXferCount >= huart->RxXferSize)) {
@@ -300,7 +302,8 @@ HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
     huart->RxXferCount = ++RxXferCount; // Update the receive count
 
     return HAL_OK;
-  } else {
+  }
+  else {
     return HAL_BUSY;
   }
 }
@@ -317,7 +320,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
   // Determine the string source
   if (huart->Instance == USART1_BASE) {
     inString->messageSource = MSG_SRC_USB;
-  } else if (huart->Instance == USART2_BASE) {
+  }
+  else if (huart->Instance == USART2_BASE) {
     inString->messageSource = MSG_SRC_WIFI;
   }
 

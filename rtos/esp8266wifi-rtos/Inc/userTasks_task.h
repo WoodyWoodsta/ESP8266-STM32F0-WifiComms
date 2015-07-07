@@ -87,7 +87,5 @@ void StartBossTask(void const * argument);
 void StartUSARTInTask(void const * argument);
 void StartUSARTOutTask(void const * argument);
 msg_StringMessage_t* msgStringStructAlloc(osPoolId mPool, uint32_t msgStringLength, char *msgString);
-void msgStringStructFree(osPoolId mPool, msg_StringMessage_t *msgStringStructPtr);
-void msgCommandSend(osPoolId mPool, osMessageQId messageQ, msg_CommandMessage_t *msgCommandTxPtr, msgSource_t source, msgCommand_t command);
 
 #endif /*USERTASKS_TASK_H*/

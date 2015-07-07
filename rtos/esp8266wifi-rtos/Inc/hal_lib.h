@@ -12,7 +12,6 @@
 
 // == Includes ==
 #include "stm32f0xx_hal.h"
-#include "stm32f0xx_usart.h"
 
 // == Exported Variables ==
 extern UART_HandleTypeDef huart1;

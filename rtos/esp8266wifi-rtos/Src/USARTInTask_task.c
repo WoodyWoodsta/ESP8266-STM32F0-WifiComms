@@ -5,9 +5,15 @@
   * ============================================================================
   */
 
-// == Includes ==
+  // == Includes ==
 #include "userTasks_task.h"
 
+// == Function Declarations ==
+void usartHandleString(msg_StringMessage_t *msgStringRxPtr);
+void usartHandleStringAutoUSB(msg_StringMessage_t *msgStringRxPtr);
+void usartHandleStringManUSB(msg_StringMessage_t *msgStringRxPtr);
+void usartHandleStringAutoWifi(msg_StringMessage_t *msgStringRxPtr);
+void usartHandleStringManWifi(msg_StringMessage_t *msgStringRxPtr);
 // == Function Definitions ==
 /**
 * @brief USARTInTask
@@ -43,26 +49,31 @@ void StartUSARTInTask(void const * argument) {
 
       // If the message is from the USB port
       if (msgStringRxPtr->messageSource == MSG_SRC_USB) {
-        // If the current routing is to INTERPRET (i.e. if this task must handle input commands)
+        // If the current routing is to AUTO (i.e. if this task must handle input commands)
         if (wifiCommState == COMM_STATE_AUTO) {
           // If the command is the expected length and correct, do the thing!
           if ((msgStringRxPtr->messageLength == (sizeof(testATRxString) - 1))
               && (strncmp(msgStringRxPtr->string, testATRxString, msgStringRxPtr->messageLength) == 0)) {
             // Send the "Send AT" command to USART Out Task
             msgCommandSend(msgPoolUSARTOut, msgQUSARTOut, msgCommandTxPtr, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_SEND_AT);
+
           } else if ((msgStringRxPtr->messageLength == (sizeof(led0ToggleRxString) - 1))
                      && (strncmp(msgStringRxPtr->string, led0ToggleRxString, msgStringRxPtr->messageLength) == 0)) {
             HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
+
           } else if ((msgStringRxPtr->messageLength == (sizeof(commStateManualRxString) - 1))
                      && (strncmp(msgStringRxPtr->string, commStateManualRxString, msgStringRxPtr->messageLength) == 0)) {
             wifiCommState = COMM_STATE_MANUAL;
             HAL_UART_Transmit_DMA(&huart1, commStateManualTxString, sizeof(commStateManualTxString) - 1);
+
           }
+          // Or, if current routing is MANUAL (i.e. all comms get routed wifi<-->usb)
         } else if (wifiCommState == COMM_STATE_MANUAL) {
           if ((msgStringRxPtr->messageLength == (sizeof(commStateAutoRxString) - 1))
               && (strncmp(msgStringRxPtr->string, commStateAutoRxString, msgStringRxPtr->messageLength) == 0)) {
             wifiCommState = COMM_STATE_AUTO;
             HAL_UART_Transmit_DMA(&huart1, commStateAutoTxString, sizeof(commStateManualTxString) - 1);
+
           } else {
             memcpy(directInBuff, msgStringRxPtr->string, msgStringRxPtr->messageLength);
 
@@ -71,6 +82,7 @@ void StartUSARTInTask(void const * argument) {
             directInBuff[msgStringRxPtr->messageLength + 1] = '\n';
 
             HAL_UART_Transmit_DMA(&huart2, directInBuff, msgStringRxPtr->messageLength + 2);
+
           }
         }
       } else if ((msgStringRxPtr->messageSource == MSG_SRC_WIFI) && (wifiCommState == COMM_STATE_MANUAL)) {

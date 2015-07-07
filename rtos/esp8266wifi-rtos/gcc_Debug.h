@@ -1038,13 +1038,13 @@
 #endif
 
 // --- Include directories begin --- //
-//D:/_EmbeddedDev/Projects/ESP8266-STM32F0-WifiComms/rtos/esp8266wifi-rtos/Inc
-//D:/_EmbeddedDev/Projects/ESP8266-STM32F0-WifiComms/rtos/esp8266wifi-rtos/Lib/Drivers/CMSIS/Device/ST/STM32F0xx/Include
-//D:/_EmbeddedDev/Projects/ESP8266-STM32F0-WifiComms/rtos/esp8266wifi-rtos/Lib/Drivers/CMSIS/Include
-//D:/_EmbeddedDev/Projects/ESP8266-STM32F0-WifiComms/rtos/esp8266wifi-rtos/Lib/Drivers/STM32F0xx_HAL_Driver/Inc
-//D:/_EmbeddedDev/Projects/ESP8266-STM32F0-WifiComms/rtos/esp8266wifi-rtos/Lib/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS
-//D:/_EmbeddedDev/Projects/ESP8266-STM32F0-WifiComms/rtos/esp8266wifi-rtos/Lib/Middlewares/Third_Party/FreeRTOS/Source/include
-//D:/_EmbeddedDev/Projects/ESP8266-STM32F0-WifiComms/rtos/esp8266wifi-rtos/Lib/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM0
+//$(ProjectDir)/Inc
+//$(ProjectDir)/Lib/Drivers/CMSIS/Device/ST/STM32F0xx/Include
+//$(ProjectDir)/Lib/Drivers/CMSIS/Include
+//$(ProjectDir)/Lib/Drivers/STM32F0xx_HAL_Driver/Inc
+//$(ProjectDir)/Lib/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS
+//$(ProjectDir)/Lib/Middlewares/Third_Party/FreeRTOS/Source/include
+//$(ProjectDir)/Lib/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM0
 //$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/CMSIS/Device/ST/STM32F0xx/Include
 //$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/CMSIS/Include
 //$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/STM32F0xx_StdPeriph_Driver/inc

@@ -8,7 +8,6 @@
     </CustomSourceDirectories>
     <MainSourceDirectory>$(ProjectDir)</MainSourceDirectory>
     <EmbeddedProfileFile>stm32.xml</EmbeddedProfileFile>
-    <ExcludeToolDirsFromMakeFiles>false</ExcludeToolDirsFromMakeFiles>
   </Project>
   <Build xsi:type="com.visualgdb.build.embedded">
     <MakeFilePathRelativeToSourceDir>Makefile</MakeFilePathRelativeToSourceDir>
@@ -135,6 +134,7 @@
   <CustomDebug>
     <PreDebugActions />
     <PostDebugActions />
+    <DebugStopActions />
     <BreakMode>Default</BreakMode>
   </CustomDebug>
   <CustomShortcuts>
@@ -143,6 +143,9 @@
   </CustomShortcuts>
   <UserDefinedVariables />
   <CodeSense>
-    <Enabled>Unknown</Enabled>
+    <Enabled>True</Enabled>
+    <CFLAGS />
+    <CXXFLAGS />
+    <ExternalSourceFileList />
   </CodeSense>
 </VisualGDBProjectSettings2>
