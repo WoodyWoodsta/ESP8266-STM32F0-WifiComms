@@ -2,8 +2,9 @@
 <EmbeddedProfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <ToolchainID>com.visualgdb.arm-eabi</ToolchainID>
   <BspID>com.sysprogs.arm.stm32</BspID>
+  <BspVersion>3.0</BspVersion>
   <McuID>STM32F051C6</McuID>
-  <MCUDefinitionFile>devices\STM32F0xxxx.xml</MCUDefinitionFile>
+  <MCUDefinitionFile>STM32F0xxxx/DeviceDefinitions/stm32f051x8.xml</MCUDefinitionFile>
   <MCUProperties>
     <Entries>
       <KeyValue>
@@ -21,4 +22,5 @@
     </Entries>
   </MCUProperties>
   <BSPSourceFolderName>Device-specific files</BSPSourceFolderName>
+  <MCUMakFile>stm32.mak</MCUMakFile>
 </EmbeddedProfile>

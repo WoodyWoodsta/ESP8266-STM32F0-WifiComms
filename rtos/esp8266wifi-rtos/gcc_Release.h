@@ -170,6 +170,9 @@
 #ifndef __DEC32_EPSILON__
 #define __DEC32_EPSILON__ 1E-6DF
 #endif
+#ifndef __OPTIMIZE__
+#define __OPTIMIZE__ 1
+#endif
 #ifndef __CHAR_UNSIGNED__
 #define __CHAR_UNSIGNED__ 1
 #endif
@@ -211,6 +214,9 @@
 #endif
 #ifndef __SIZEOF_POINTER__
 #define __SIZEOF_POINTER__ 4
+#endif
+#ifndef NDEBUG
+#define NDEBUG 1
 #endif
 #ifndef __GCC_ATOMIC_CHAR16_T_LOCK_FREE
 #define __GCC_ATOMIC_CHAR16_T_LOCK_FREE 1
@@ -286,6 +292,9 @@
 #endif
 #ifndef __ULFRACT_MIN__
 #define __ULFRACT_MIN__ 0.0ULR
+#endif
+#ifndef RELEASE
+#define RELEASE 1
 #endif
 #ifndef __LDBL_HAS_QUIET_NAN__
 #define __LDBL_HAS_QUIET_NAN__ 1
@@ -486,9 +495,6 @@
 #ifndef __UHA_FBIT__
 #define __UHA_FBIT__ 8
 #endif
-#ifndef __NO_INLINE__
-#define __NO_INLINE__ 1
-#endif
 #ifndef __SFRACT_MIN__
 #define __SFRACT_MIN__ (-0.5HR-0.5HR)
 #endif
@@ -524,9 +530,6 @@
 #endif
 #ifndef __FLOAT_WORD_ORDER__
 #define __FLOAT_WORD_ORDER__ __ORDER_LITTLE_ENDIAN__
-#endif
-#ifndef STM32F051
-#define STM32F051 1
 #endif
 #ifndef __USFRACT_MIN__
 #define __USFRACT_MIN__ 0.0UHR
@@ -720,6 +723,9 @@
 #ifndef __SFRACT_FBIT__
 #define __SFRACT_FBIT__ 7
 #endif
+#ifndef STM32F051x8
+#define STM32F051x8 1
+#endif
 #ifndef __SACCUM_MIN__
 #define __SACCUM_MIN__ (-0X1P7HK-0X1P7HK)
 #endif
@@ -770,6 +776,9 @@
 #endif
 #ifndef __INT_MAX__
 #define __INT_MAX__ 2147483647
+#endif
+#ifndef ARM_MATH_CM0
+#define ARM_MATH_CM0 1
 #endif
 #ifndef __LACCUM_FBIT__
 #define __LACCUM_FBIT__ 31
@@ -1029,18 +1038,14 @@
 #ifndef __ATOMIC_RELEASE
 #define __ATOMIC_RELEASE 3
 #endif
-#ifndef NDEBUG
-#define NDEBUG 
-#endif
-#ifndef RELEASE
-#define RELEASE 
-#endif
 #endif
 
 // --- Include directories begin --- //
-//$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/CMSIS/Device/ST/STM32F0xx/Include
-//$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/CMSIS/Include
-//$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/STM32F0xx_StdPeriph_Driver/inc
+//.
+//$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/STM32F0xx_HAL_Driver/Inc
+//$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/CMSIS_HAL/Device/ST/STM32F0xx/Include
+//$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/CMSIS_HAL/Include
+//$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/CMSIS_HAL/RTOS/Template
 //c:\sysgcc\arm-eabi\bin\../lib/gcc/arm-eabi/4.9.2/../../../../arm-eabi/include/c++/4.9.2
 //c:\sysgcc\arm-eabi\bin\../lib/gcc/arm-eabi/4.9.2/../../../../arm-eabi/include/c++/4.9.2/arm-eabi/thumb/cortex_m0
 //c:\sysgcc\arm-eabi\bin\../lib/gcc/arm-eabi/4.9.2/../../../../arm-eabi/include/c++/4.9.2/backward

@@ -5,7 +5,7 @@
 BINARYDIR := Debug
 
 #Additional flags
-PREPROCESSOR_MACROS := DEBUG
+PREPROCESSOR_MACROS := DEBUG STM32F051x8
 INCLUDE_DIRS := D:/_EmbeddedDev/Projects/ESP8266-STM32F0-WifiComms/rtos/esp8266wifi-rtos/Inc D:/_EmbeddedDev/Projects/ESP8266-STM32F0-WifiComms/rtos/esp8266wifi-rtos/Lib/Drivers/CMSIS/Device/ST/STM32F0xx/Include D:/_EmbeddedDev/Projects/ESP8266-STM32F0-WifiComms/rtos/esp8266wifi-rtos/Lib/Drivers/CMSIS/Include D:/_EmbeddedDev/Projects/ESP8266-STM32F0-WifiComms/rtos/esp8266wifi-rtos/Lib/Drivers/STM32F0xx_HAL_Driver/Inc D:/_EmbeddedDev/Projects/ESP8266-STM32F0-WifiComms/rtos/esp8266wifi-rtos/Lib/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS D:/_EmbeddedDev/Projects/ESP8266-STM32F0-WifiComms/rtos/esp8266wifi-rtos/Lib/Middlewares/Third_Party/FreeRTOS/Source/include D:/_EmbeddedDev/Projects/ESP8266-STM32F0-WifiComms/rtos/esp8266wifi-rtos/Lib/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM0
 LIBRARY_DIRS := 
 LIBRARY_NAMES := 
@@ -13,8 +13,8 @@ ADDITIONAL_LINKER_INPUTS :=
 MACOS_FRAMEWORKS := 
 LINUX_PACKAGES := 
 
-CFLAGS := -ggdb -ffunction-sections -O0
-CXXFLAGS := -ggdb -ffunction-sections -fno-exceptions -fno-rtti -O0
+CFLAGS := -ggdb -ffunction-sections -Os
+CXXFLAGS := -ggdb -ffunction-sections -fno-exceptions -fno-rtti -Os
 ASFLAGS := 
 LDFLAGS := -Wl,-gc-sections
 COMMONFLAGS := 

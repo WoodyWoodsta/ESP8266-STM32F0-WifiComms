@@ -1,14 +1,27 @@
-#include "hal_lib.h"
+/**
+  * ============================================================================
+  * File Name          : hal_lib.c
+  * Description        : Custom Hardware Abstraction Library adapted from
+  *                      STM32Cube HAL
+  * ============================================================================
+  */
 
-// == Privates ==
+// == Includes ==
+#include "hal_lib.h"
+#include "userTasks_task.h"
+
+// == Private Variables ==
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart1_tx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
+// == Function Definitions ==
 
-/** System Clock Configuration
+/**
+* @brief System clock configuration
 */
+
 void SystemClock_Config(void) {
 
   RCC_OscInitTypeDef RCC_OscInitStruct;
@@ -56,7 +69,9 @@ void MX_USART1_UART_Init(void) {
 
 }
 
-/* USART2 init function */
+/**
+* @brief USART2 (WIFI) Initialisation Function
+*/
 void MX_USART2_UART_Init(void) {
 
   huart2.Instance = USART2;
@@ -74,7 +89,7 @@ void MX_USART2_UART_Init(void) {
 }
 
 /**
-* Enable DMA controller clock
+* @brief DMA controller clock Initialisation
 */
 void MX_DMA_Init(void) {
   /* DMA controller clock enable */
@@ -88,7 +103,9 @@ void MX_DMA_Init(void) {
 
 }
 
-/** Configure pins as
+/**
+* @brief GPIO Initialisation
+* Configure pins as
 * Analog
 * Input
 * Output
@@ -149,7 +166,8 @@ HAL_StatusTypeDef cHAL_UART_TermReceive_IT(UART_HandleTypeDef *huart, uint8_t *p
     /* Check if a transmit process is ongoing or not */
     if (huart->State == HAL_UART_STATE_BUSY_TX) {
       huart->State = HAL_UART_STATE_BUSY_TX_RX;
-    } else {
+    }
+    else {
       huart->State = HAL_UART_STATE_BUSY_RX;
     }
 
@@ -166,7 +184,8 @@ HAL_StatusTypeDef cHAL_UART_TermReceive_IT(UART_HandleTypeDef *huart, uint8_t *p
     __HAL_UART_ENABLE_IT(huart, UART_IT_RXNE);
 
     return HAL_OK;
-  } else {
+  }
+  else {
     return HAL_BUSY;
   }
 }
@@ -264,8 +283,8 @@ HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
 
   if ((huart->State == HAL_UART_STATE_BUSY_RX) || (huart->State == HAL_UART_STATE_BUSY_TX_RX) || (huart->State == HAL_UART_STATE_READY)) {
 
-    uint8_t inChar = (uint8_t) (huart->Instance->RDR & (uint8_t) uhMask);
-    
+    uint8_t inChar = (uint8_t)(huart->Instance->RDR & (uint8_t) uhMask);
+
     // If we have reached a <cr>, <lf> or NULL, or if we have reached the end of the buffer, send off a completed string
     if ((inChar == 0x0D) || (inChar == 0x0A) || (inChar == 0x00) || (RxXferCount >= huart->RxXferSize)) {
 
@@ -273,7 +292,7 @@ HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
       if (RxXferCount != 0) {
         HAL_UART_RxCpltCallback(huart);
       }
- 
+
       huart->RxXferCount = 0; // Reset string count
 
       return HAL_OK;
@@ -283,11 +302,31 @@ HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
     huart->RxXferCount = ++RxXferCount; // Update the receive count
 
     return HAL_OK;
-  } else {
+  }
+  else {
     return HAL_BUSY;
   }
 }
 
+/**
+* @brief USART callback on receiving a completed string (terminated)
+* @param huart: UART handle
+*/
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-  HAL_StatusTypeDef status = HAL_UART_Transmit_DMA(huart, huart->pRxBuffPtr, huart->RxXferCount);
+  // TODO Come sort this out later
+
+  //msg_StringMessage_t *inString;
+  //inString = msgStringStructAlloc(msgPoolUSARTIn, huart->RxXferCount, huart->pRxBuffPtr); // Formulate the message
+
+  //// Determine the string source
+  //if (huart->Instance == USART1_BASE) {
+  //  inString->messageSource = MSG_SRC_USB;
+  //}
+  //else if (huart->Instance == USART2_BASE) {
+  //  inString->messageSource = MSG_SRC_WIFI;
+  //}
+
+  //// Send the string, do not wait for timeout since we are in an interrupt
+  //osMessagePut(msgQUSARTIn, (uint32_t) inString, 0);
 }
