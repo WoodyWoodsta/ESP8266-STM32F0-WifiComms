@@ -314,17 +314,19 @@ HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
 */
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-  msg_StringMessage_t *inString;
-  inString = msgStringStructAlloc(msgPoolUSARTIn, huart->RxXferCount, huart->pRxBuffPtr); // Formulate the message
+  // TODO Come sort this out later
 
-  // Determine the string source
-  if (huart->Instance == USART1_BASE) {
-    inString->messageSource = MSG_SRC_USB;
-  }
-  else if (huart->Instance == USART2_BASE) {
-    inString->messageSource = MSG_SRC_WIFI;
-  }
+  //msg_StringMessage_t *inString;
+  //inString = msgStringStructAlloc(msgPoolUSARTIn, huart->RxXferCount, huart->pRxBuffPtr); // Formulate the message
 
-  // Send the string, do not wait for timeout since we are in an interrupt
-  osMessagePut(msgQUSARTIn, (uint32_t) inString, 0);
+  //// Determine the string source
+  //if (huart->Instance == USART1_BASE) {
+  //  inString->messageSource = MSG_SRC_USB;
+  //}
+  //else if (huart->Instance == USART2_BASE) {
+  //  inString->messageSource = MSG_SRC_WIFI;
+  //}
+
+  //// Send the string, do not wait for timeout since we are in an interrupt
+  //osMessagePut(msgQUSARTIn, (uint32_t) inString, 0);
 }

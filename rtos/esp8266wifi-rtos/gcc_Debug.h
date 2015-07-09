@@ -525,9 +525,6 @@
 #ifndef __FLOAT_WORD_ORDER__
 #define __FLOAT_WORD_ORDER__ __ORDER_LITTLE_ENDIAN__
 #endif
-#ifndef STM32F051
-#define STM32F051 1
-#endif
 #ifndef __USFRACT_MIN__
 #define __USFRACT_MIN__ 0.0UHR
 #endif
@@ -776,6 +773,9 @@
 #endif
 #ifndef __INT_MAX__
 #define __INT_MAX__ 2147483647
+#endif
+#ifndef ARM_MATH_CM0
+#define ARM_MATH_CM0 1
 #endif
 #ifndef __LACCUM_FBIT__
 #define __LACCUM_FBIT__ 31
@@ -1045,9 +1045,11 @@
 //$(ProjectDir)/Lib/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS
 //$(ProjectDir)/Lib/Middlewares/Third_Party/FreeRTOS/Source/include
 //$(ProjectDir)/Lib/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM0
-//$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/CMSIS/Device/ST/STM32F0xx/Include
-//$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/CMSIS/Include
-//$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/STM32F0xx_StdPeriph_Driver/inc
+//.
+//$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/STM32F0xx_HAL_Driver/Inc
+//$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/CMSIS_HAL/Device/ST/STM32F0xx/Include
+//$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/CMSIS_HAL/Include
+//$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32/STM32F0xxxx/CMSIS_HAL/RTOS/Template
 //c:\sysgcc\arm-eabi\bin\../lib/gcc/arm-eabi/4.9.2/../../../../arm-eabi/include/c++/4.9.2
 //c:\sysgcc\arm-eabi\bin\../lib/gcc/arm-eabi/4.9.2/../../../../arm-eabi/include/c++/4.9.2/arm-eabi/thumb/cortex_m0
 //c:\sysgcc\arm-eabi\bin\../lib/gcc/arm-eabi/4.9.2/../../../../arm-eabi/include/c++/4.9.2/backward

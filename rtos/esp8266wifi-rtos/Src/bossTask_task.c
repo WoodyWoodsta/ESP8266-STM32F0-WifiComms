@@ -9,9 +9,6 @@
 #include "userTasks_task.h"
 
 // == Declarations ==
-uint8_t UART1InBuff[128]; // Prep the memory
-uint8_t UART2InBuff[128];
-char freeHeapString[15];
 
 // == Function Definitions ==
 /**
@@ -19,20 +16,24 @@ char freeHeapString[15];
 * @param argument
 */
 void StartBossTask(void const * argument) {
-  // Start the USART1 incomming stream
-  
-  cHAL_UART_TermReceive_IT(&huart1, UART1InBuff, 128);
-  cHAL_UART_TermReceive_IT(&huart2, UART2InBuff, 128);
-
+  msg_genericMessage_t rxMessage;
   /* Infinite loop */
   for (;;) {
-    if (wifiCommState == COMM_STATE_AUTO) {
-      size_t freeHeap = xPortGetFreeHeapSize();
+    fetchMessage(msgQBoss, &rxMessage, osWaitForever);
 
-      sprintf(freeHeapString, "%d\r\n", (int) freeHeap);
-      HAL_UART_Transmit_DMA(&huart1, (uint8_t *) freeHeapString, 6);
+    switch (rxMessage.messageType) {
+    case MSG_TYPE_COORDS: {
+        data_coords_t rxData;
+        decodeMessage(&rxMessage, &rxData);
+        if (rxData.x == 100 && rxData.y == 200) {
+          GPIOB->ODR = rxData.z;
+        }
+      }
+      break;
+    default:
+      break;
     }
 
-    osDelay(2000);
+    osDelay(1);
   }
 }

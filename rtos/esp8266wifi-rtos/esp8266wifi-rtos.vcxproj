@@ -37,7 +37,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <NMakeIncludeSearchPath>Inc;Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Include;Lib\Drivers\CMSIS\Include;Lib\Drivers\STM32F0xx_HAL_Driver\Inc;Lib\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS;Lib\Middlewares\Third_Party\FreeRTOS\Source\include;Lib\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM0;$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32\STM32F0xxxx\CMSIS\Device\ST\STM32F0xx\Include;$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32\STM32F0xxxx\CMSIS\Include;$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32\STM32F0xxxx\STM32F0xx_StdPeriph_Driver\inc;c:\sysgcc\arm-eabi\arm-eabi\include\c++\4.9.2;c:\sysgcc\arm-eabi\arm-eabi\include\c++\4.9.2\arm-eabi\thumb\cortex_m0;c:\sysgcc\arm-eabi\arm-eabi\include\c++\4.9.2\backward;c:\sysgcc\arm-eabi\lib\gcc\arm-eabi\4.9.2\include;c:\sysgcc\arm-eabi\lib\gcc\arm-eabi\4.9.2\include-fixed;c:\sysgcc\arm-eabi\arm-eabi\sys-include;c:\sysgcc\arm-eabi\arm-eabi\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>Inc;Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Include;Lib\Drivers\CMSIS\Include;Lib\Drivers\STM32F0xx_HAL_Driver\Inc;Lib\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS;Lib\Middlewares\Third_Party\FreeRTOS\Source\include;Lib\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM0;.;$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32\STM32F0xxxx\STM32F0xx_HAL_Driver\Inc;$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32\STM32F0xxxx\CMSIS_HAL\Device\ST\STM32F0xx\Include;$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32\STM32F0xxxx\CMSIS_HAL\Include;$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32\STM32F0xxxx\CMSIS_HAL\RTOS\Template;c:\sysgcc\arm-eabi\arm-eabi\include\c++\4.9.2;c:\sysgcc\arm-eabi\arm-eabi\include\c++\4.9.2\arm-eabi\thumb\cortex_m0;c:\sysgcc\arm-eabi\arm-eabi\include\c++\4.9.2\backward;c:\sysgcc\arm-eabi\lib\gcc\arm-eabi\4.9.2\include;c:\sysgcc\arm-eabi\lib\gcc\arm-eabi\4.9.2\include-fixed;c:\sysgcc\arm-eabi\arm-eabi\sys-include;c:\sysgcc\arm-eabi\arm-eabi\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
     <NMakeForcedIncludes>$(ProjectDir)\gcc_Debug.h;$(VISUALGDB_DIR)\gcc_compat.h;$(LOCALAPPDATA)\VisualGDB\EmbeddedBSPs\arm-eabi\com.sysprogs.arm.stm32\stm32_compat.h;$(NMakeForcedIncludes)</NMakeForcedIncludes>
     <NMakeBuildCommandLine>"$(VISUALGDB_DIR)\VisualGDB.exe" /build "$(ProjectPath)" "/solution:$(SolutionPath)" "/config:$(Configuration)" "/platform:$(Platform)"</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>"$(VISUALGDB_DIR)\VisualGDB.exe" /clean "$(ProjectPath)" "/solution:$(SolutionPath)" "/config:$(Configuration)" "/platform:$(Platform)"</NMakeCleanCommandLine>
@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\FreeRTOSConfig.h" />
+    <ClInclude Include="Inc\genericMessaging_lib.h" />
     <ClInclude Include="Inc\hal_lib.h" />
     <ClInclude Include="Inc\stm32f0xx_hal_conf.h" />
     <ClInclude Include="Inc\stm32f0xx_it.h" />
@@ -162,6 +163,7 @@
     <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\tasks.c" />
     <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\timers.c" />
     <ClCompile Include="Src\freertos.c" />
+    <ClCompile Include="Src\genericMessaging_lib.c" />
     <ClCompile Include="Src\hal_lib.c" />
     <ClCompile Include="Src\main.c" />
     <ClCompile Include="Src\stm32f0xx_hal_msp.c" />

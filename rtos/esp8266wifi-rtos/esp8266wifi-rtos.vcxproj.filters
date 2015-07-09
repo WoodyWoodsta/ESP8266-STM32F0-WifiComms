@@ -365,6 +365,9 @@
     <ClInclude Include="Inc\userTasks_task.h">
       <Filter>Header files\Inc</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\genericMessaging_lib.h">
+      <Filter>Header files\Inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Source\Templates\system_stm32f0xx.c">
@@ -461,6 +464,9 @@
       <Filter>Source files\Src</Filter>
     </ClCompile>
     <ClCompile Include="Src\bossTask_task.c">
+      <Filter>Source files\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\genericMessaging_lib.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
   </ItemGroup>

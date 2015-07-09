@@ -39,17 +39,17 @@
 #include "userTasks_task.h"
 
 // == Message Pools and Queues ==
-// USART In Task String Queue
-osPoolDef(msgPoolUSARTIn, 5, msg_StringMessage_t);
-osMessageQDef(msgQUSARTIn, 5, msg_StringMessage_t);
+// Global generic message pool definition
+osPoolDef(genericMPool, GLOBAL_MESSAGE_MPOOL_SIZE, msg_genericMessage_t);
 
-// USART Out Task String Queue
-osPoolDef(msgPoolUSARTOut, 2, msg_CommandMessage_t);
-osMessageQDef(msgQUSARTOut, 2, msg_CommandMessage_t);
+// USART In Task String Queue
+osMessageQDef(msgQUSARTIn, 5, msg_genericMessage_t);
+
+// USART Out Task Message Queue
+osMessageQDef(msgQUSARTOut, 2, msg_genericMessage_t);
 
 // Boss Task Command Queue
-osPoolDef(msgPoolBoss, 5, msg_CommandMessage_t);
-osMessageQDef(msgQBoss, 5, msg_CommandMessage_t);
+osMessageQDef(msgQBoss, 5, msg_genericMessage_t);
 
 
 // == Function Definitions ==
@@ -92,16 +92,16 @@ int main(void) {
   USARTOutTaskHandle = osThreadCreate(osThread(USARTOutTask), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
+  // Generic messaging memory pool
+  genericMPool = osPoolCreate(osPool(genericMPool));
+
   // USART In Task String Queue
-  msgPoolUSARTIn = osPoolCreate(osPool(msgPoolUSARTIn));
   msgQUSARTIn = osMessageCreate(osMessageQ(msgQUSARTIn), NULL);
   
   // USART Out Task String Queue
-  msgPoolUSARTOut = osPoolCreate(osPool(msgPoolUSARTOut));
   msgQUSARTOut = osMessageCreate(osMessageQ(msgQUSARTOut), NULL);
 
   // Boss Task Command Queue
-  msgPoolBoss = osPoolCreate(osPool(msgPoolBoss));
   msgQBoss = osMessageCreate(osMessageQ(msgQBoss), NULL);
   
   /* USER CODE END RTOS_QUEUES */
