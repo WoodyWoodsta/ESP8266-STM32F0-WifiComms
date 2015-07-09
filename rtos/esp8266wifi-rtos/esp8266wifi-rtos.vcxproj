@@ -74,6 +74,7 @@
     <ClInclude Include="Inc\hal_lib.h" />
     <ClInclude Include="Inc\stm32f0xx_hal_conf.h" />
     <ClInclude Include="Inc\stm32f0xx_it.h" />
+    <ClInclude Include="Inc\strings_res.h" />
     <ClInclude Include="Inc\userTasks_task.h" />
     <ClInclude Include="Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Include\stm32f030x6.h" />
     <ClInclude Include="Lib\Drivers\CMSIS\Device\ST\STM32F0xx\Include\stm32f030x8.h" />
@@ -168,6 +169,7 @@
     <ClCompile Include="Src\main.c" />
     <ClCompile Include="Src\stm32f0xx_hal_msp.c" />
     <ClCompile Include="Src\stm32f0xx_it.c" />
+    <ClCompile Include="Src\strings_res.c" />
     <ClCompile Include="Src\USARTInTask_task.c" />
     <ClCompile Include="Src\USARTOutTask_task.c" />
     <ClCompile Include="Src\userTasks_task.c" />

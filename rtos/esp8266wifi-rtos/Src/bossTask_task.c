@@ -30,10 +30,22 @@ void StartBossTask(void const * argument) {
         }
       }
       break;
+    case MSG_TYPE_COMMAND:
+      if (decodeCommand(&rxMessage) == MSG_COMMAND_LED2_TOGGLE) {
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, SET);
+
+      } else {
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, SET);
+
+      }
+      break;
     default:
       break;
     }
 
-    osDelay(1);
+    osDelay(100);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, RESET);
+
   }
 }

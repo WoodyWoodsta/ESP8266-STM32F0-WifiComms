@@ -2,6 +2,7 @@
   * ============================================================================
   * File Name          : genericMessaging_lib.h
   * Description        : Generic messaging system header file
+  * Author             : Sean Wood
   * ============================================================================
   */
 
@@ -81,7 +82,9 @@ osPoolId genericMPool;
 
 // == Function Prototypes ==
 void sendMessage(osMessageQId msgQ, msgType_t type, msgSource_t source, uint8_t mRsp, void *data, uint32_t timeout);
+void sendCommand(osMessageQId msgQ, msgSource_t source, msgCommand_t command, uint32_t timeout);
 void fetchMessage(osMessageQId msgQ, msg_genericMessage_t *messagePtr, uint32_t timeout);
 void *decodeMessage(msg_genericMessage_t *messagePtr, void *dataStruct);
+msgCommand_t decodeCommand(msg_genericMessage_t *messagePtr);
 
 #endif /*GENERICMESSAGING_LIB_H*/
