@@ -15,11 +15,12 @@
 * @param argument
 */
 void StartUSARTOutTask(void const * argument) {
-
+  size_t freeHeap;
   /* Infinite loop */
   for (;;) {
-    sendCommand(msgQBoss, MSG_SRC_USART_OUT_TASK, MSG_COMMAND_LED2_TOGGLE, osWaitForever);
+    sendCommand(msgQBoss, MSG_SRC_USART_OUT_TASK, MSG_COMMAND_LED0_TOGGLE, osWaitForever);
 
+    freeHeap = xPortGetFreeHeapSize();
     osDelay(500);
   
   }

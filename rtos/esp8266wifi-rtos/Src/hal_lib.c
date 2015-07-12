@@ -3,16 +3,20 @@
   * File Name          : hal_lib.c
   * Description        : Custom Hardware Abstraction Library adapted from
   *                      STM32Cube HAL
+  * Authors            : Sean Wood
+  *                      Adaptations from CMSIS-RTOS and the STM32Cube HAL
   * ============================================================================
   */
 
-// == Includes ==
+  // == Includes ==
 #include "hal_lib.h"
 #include "userTasks_task.h"
 
-// == Private Variables ==
+// == Exported Variables ==
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
+
+// == Private Variables ==
 DMA_HandleTypeDef hdma_usart1_tx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
@@ -142,22 +146,20 @@ void MX_GPIO_Init(void) {
 
 /**
 * @brief Receive data, in interrupt mode (non-blocking), up until a terminator
-* @param huart: uart handle
+* @param *huart: Pointer to UART handle
 * @param pData: pointer to data buffer
 * @retval HAL status
 */
-HAL_StatusTypeDef cHAL_UART_TermReceive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t MaxSize) {
+HAL_StatusTypeDef cHAL_UART_TermReceive_IT(UART_HandleTypeDef *huart, uint16_t MaxSize) {
   if ((huart->State == HAL_UART_STATE_READY) || (huart->State == HAL_UART_STATE_BUSY_TX)) {
-    if (pData == NULL) {
-      return HAL_ERROR;
-    }
 
     /* Process Locked */
     __HAL_LOCK(huart);
 
-    huart->pRxBuffPtr = pData;
-    huart->RxXferSize = MaxSize; // Maximum created buffer associated with pData pointer
-    huart->RxXferCount = 0; // Use this to count how many characters are in current buffer
+    huart->pRxBuffPtr = NULL;
+    huart->RxXferMaxSize = MaxSize; // Maximum dynamically allocated buffer
+    huart->RxXferSize = 0; // Current memory buffer size
+    huart->RxXferCount = 0; // Count of how many characters are in current buffer
 
     /* Computation of UART mask to apply to RDR register */
     __HAL_UART_MASK_COMPUTATION(huart);
@@ -166,8 +168,7 @@ HAL_StatusTypeDef cHAL_UART_TermReceive_IT(UART_HandleTypeDef *huart, uint8_t *p
     /* Check if a transmit process is ongoing or not */
     if (huart->State == HAL_UART_STATE_BUSY_TX) {
       huart->State = HAL_UART_STATE_BUSY_TX_RX;
-    }
-    else {
+    } else {
       huart->State = HAL_UART_STATE_BUSY_RX;
     }
 
@@ -184,19 +185,17 @@ HAL_StatusTypeDef cHAL_UART_TermReceive_IT(UART_HandleTypeDef *huart, uint8_t *p
     __HAL_UART_ENABLE_IT(huart, UART_IT_RXNE);
 
     return HAL_OK;
-  }
-  else {
+  } else {
     return HAL_BUSY;
   }
 }
 
 /**
 * @brief This function handles UART interrupt request for "Receive via IT" Custom Driver.
-* @param huart: uart handle
+* @param *huart: Pointer to UART handle
 * @retval None
 */
 void cHAL_UART_IRQTermHandler(UART_HandleTypeDef *huart) {
-  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2 | GPIO_PIN_3);
   /* UART parity error interrupt occurred -------------------------------------*/
   if ((__HAL_UART_GET_IT(huart, UART_IT_PE) != RESET) && (__HAL_UART_GET_IT_SOURCE(huart, UART_IT_PE) != RESET)) {
     __HAL_UART_CLEAR_IT(huart, UART_CLEAR_PEF);
@@ -251,82 +250,146 @@ void cHAL_UART_IRQTermHandler(UART_HandleTypeDef *huart) {
   /* UART in mode Receiver ---------------------------------------------------*/
   if ((__HAL_UART_GET_IT(huart, UART_IT_RXNE) != RESET) && (__HAL_UART_GET_IT_SOURCE(huart, UART_IT_RXNE) != RESET)) {
     HAL_StatusTypeDef status = cUART_TermReceive_IT(huart);
+
     /* Clear RXNE interrupt flag */
     __HAL_UART_SEND_REQ(huart, UART_RXDATA_FLUSH_REQUEST);
   }
-
-  // Don't need these, TODO consider removing
-  ///* UART in mode Transmitter ------------------------------------------------*/
-  //if ((__HAL_UART_GET_IT(huart, UART_IT_TXE) != RESET) && (__HAL_UART_GET_IT_SOURCE(huart, UART_IT_TXE) != RESET)) {
-  //  UART_Transmit_IT(huart);
-  //}
-
-  ///* UART in mode Transmitter ------------------------------------------------*/
-  //if ((__HAL_UART_GET_IT(huart, UART_IT_TC) != RESET) && (__HAL_UART_GET_IT_SOURCE(huart, UART_IT_TC) != RESET)) {
-  //  UART_EndTransmit_IT(huart);
-  //}
-  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2 | GPIO_PIN_3);
-
 }
 
 /**
 * @brief Receive data, in interrupt mode (non-blocking), up until a terminator (data transfer)
-*         Function called under interruption only, once
+*         Function called for every byte under interruption only, once
 *         interruptions have been enabled by HAL_UART_Receive_IT()
-* @param  huart: UART handle
+* @param  *huart: Pointer to UART handle
 * @retval HAL status
 */
 HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
-  uint16_t* tmp;
   uint16_t uhMask = huart->Mask;
+  uint16_t RxXferSize = huart->RxXferSize;
   uint16_t RxXferCount = huart->RxXferCount;
 
-  if ((huart->State == HAL_UART_STATE_BUSY_RX) || (huart->State == HAL_UART_STATE_BUSY_TX_RX) || (huart->State == HAL_UART_STATE_READY)) {
+  if ((huart->State == HAL_UART_STATE_BUSY_TX_RX) || (huart->State == HAL_UART_STATE_BUSY_RX) || (huart->State == HAL_UART_STATE_READY)) {
 
-    uint8_t inChar = (uint8_t)(huart->Instance->RDR & (uint8_t) uhMask);
+    uint8_t inChar = (uint8_t) (huart->Instance->RDR & (uint8_t) uhMask);
 
-    // If we have reached a <cr>, <lf> or NULL, or if we have reached the end of the buffer, send off a completed string
-    if ((inChar == 0x0D) || (inChar == 0x0A) || (inChar == 0x00) || (RxXferCount >= huart->RxXferSize)) {
+    // If we have reached a <cr>, <lf> or NULL, or if we have reached the end of the largest buffer, send off a completed string
+    if ((inChar == 0x0D) || (inChar == 0x0A) || (inChar == 0x00) || (RxXferCount == huart->RxXferMaxSize)) {
 
       // If the string is not empty, fire the receive complete callback
       if (RxXferCount != 0) {
         HAL_UART_RxCpltCallback(huart);
+
       }
 
-      huart->RxXferCount = 0; // Reset string count
+      // Reset string and buffer count
+      huart->RxXferCount = 0;
+      huart->RxXferSize = 0;
 
+      // Exit the story here
       return HAL_OK;
+    }
+
+    // If we have run out of buffer, "re-allocate" some more
+    if (RxXferCount == RxXferSize) {
+      // Increment the current buffer size by 16 bytes
+      RxXferSize += USART_DYNAMIC_BUFFER_INCREMENT;
+
+      // Create a new pointer and allocate the new memory required
+      uint8_t *newPtr = pvPortMalloc(RxXferSize);
+
+      // Copy in and free the existing buffer, only if this is not the first allocation of the string
+      // NOTE: This is because the pointer to the previous string may still be used elsewhere
+      if (RxXferSize != USART_DYNAMIC_BUFFER_INCREMENT) {
+        memcpy(newPtr, huart->pRxBuffPtr, RxXferCount);
+        vPortFree(huart->pRxBuffPtr);
+
+      }
+
+      // Re-assign the handle's rx buffer pointer to the new pointer
+      huart->pRxBuffPtr = newPtr;
+      huart->RxXferSize = RxXferSize;
+
     }
 
     huart->pRxBuffPtr[RxXferCount] = (uint8_t) inChar;
     huart->RxXferCount = ++RxXferCount; // Update the receive count
+    // At this stage, huart->RxXferCount reflects the number of bytes in the buffer
 
     return HAL_OK;
-  }
-  else {
+
+  } else {
     return HAL_BUSY;
+
+  }
+}
+
+/**
+* @brief Transmit data out of the UART via DMA safely (i.e. without stomping existing transmissions)
+* NOTE: This will not be called in an interupt due to the use of osDelay()
+* @param *huart: Pointer to UART handle
+* @param *pData: Pointer to the data to transmit
+* @param size: Size of the data to transmit
+* @retval HAL status
+*/
+HAL_StatusTypeDef cHAL_USART_sTransmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t size) {
+  HAL_StatusTypeDef txStatus = HAL_BUSY;
+
+  // Loop until HAL_UART_Transmit_DMA signals that the DMA accepted the tramission call
+  // Return with the error if the call returned errors
+  while (1) {
+    txStatus = HAL_UART_Transmit_DMA(huart, pData, size);
+
+    // Check for OK to prevent other checks, else check for errors
+    if (txStatus == HAL_OK) { return HAL_OK; } else if (txStatus == HAL_ERROR) { return HAL_ERROR; } else if (txStatus == HAL_TIMEOUT) { return HAL_TIMEOUT; }
+    osDelay(1); // Do not block other activities TODO Comfirm the need for this
   }
 }
 
 /**
 * @brief USART callback on receiving a completed string (terminated)
-* @param huart: UART handle
+*        This callback is hardcoded to send the string buffer info to the USART In task
+* @param *huart: Pointer to UART handle
 */
-
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-  // TODO Come sort this out later
+  msg_stringMessage_t *txMessagePtr;
+  uint8_t charBuf[128];
 
-  //msg_StringMessage_t *inString;
-  //inString = msgStringStructAlloc(msgPoolUSARTIn, huart->RxXferCount, huart->pRxBuffPtr); // Formulate the message
+  // Allocate a block in the string buffer pool for the message
+  txMessagePtr = osPoolAlloc(strBufMPool);
+  if (txMessagePtr == NULL) {
+    vPortFree(txMessagePtr->stringPtr);
+    return;
+  }
 
-  //// Determine the string source
-  //if (huart->Instance == USART1_BASE) {
-  //  inString->messageSource = MSG_SRC_USB;
+  // Identify the source
+  if (huart->Instance == USART1_BASE) {
+    txMessagePtr->messageSource = MSG_SRC_USB;
+  } else { txMessagePtr->messageSource = MSG_SRC_WIFI; }
+
+  // Fill the message struct
+  txMessagePtr->stringLength = huart->RxXferCount;
+  txMessagePtr->stringPtr = huart->pRxBuffPtr;
+
+  // Send the string message!
+  uint32_t i = 0;
+  for (i = 0; i < 100; i++) {
+    __asm("nop");
+  }
+  //osStatus status = osMessagePut(msgQUSARTIn, (uint32_t) txMessagePtr, 0);
+
+  // If we did not succeed with the message send, free the message and the string
+  //if (status != osOK) {
+    vPortFree(txMessagePtr->stringPtr);
+    osPoolFree(strBufMPool, txMessagePtr);
   //}
-  //else if (huart->Instance == USART2_BASE) {
-  //  inString->messageSource = MSG_SRC_WIFI;
-  //}
 
-  //// Send the string, do not wait for timeout since we are in an interrupt
-  //osMessagePut(msgQUSARTIn, (uint32_t) inString, 0);
+}
+
+/**
+* @brief USART callback on transmitting a completed string (terminated)
+* @param *huart: Pointer to UART handle
+*/
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
+  // Free the memory held by the string during transmit
+  vPortFree(huart->pTxBuffPtr);
 }

@@ -13,6 +13,9 @@
 #include "genericMessaging_lib.h"
 
 // == Function Definitions ==
+
+// TODO Add functionality to send strings from anywhere else (in addition to the specialised string methods for the USART IRQ)
+
 /**
 * @brief Send a generic message which packages any data structure
 * @param msgQ: Message Q to send the message to
@@ -29,11 +32,11 @@ void sendMessage(osMessageQId msgQ, msgType_t type, msgSource_t source, uint8_t 
 
   // Allocate a block of memory in the global memory pool for the generic message
   messageTxPtr = osPoolAlloc(genericMPool);
-
+  
   // Identify the size of the data that will be linked in based on the data struct used
   switch (type) {
   case MSG_TYPE_STRING:
-    dataLength = sizeof(data_string_t);
+    dataLength = *((uint16_t *) data) + sizeof(uint16_t);
     break;
 
   case MSG_TYPE_COMMAND:
@@ -72,8 +75,6 @@ void sendMessage(osMessageQId msgQ, msgType_t type, msgSource_t source, uint8_t 
   osMessagePut(msgQ, (uint32_t) messageTxPtr, timeout);
 }
 
-
-// == Function Definitions ==
 /**
 * @brief Send a generic message which packages a command
 * @param msgQ: Message Q to send the message to

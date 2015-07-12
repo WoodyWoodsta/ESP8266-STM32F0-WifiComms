@@ -14,7 +14,7 @@
 osThreadId bossTaskHandle;
 osThreadId USARTInTaskHandle;
 osThreadId USARTOutTaskHandle;
-commState_t wifiCommState = COMM_STATE_AUTO;
+commState_t wifiCommState = COMM_STATE_MANUAL;
 
 // USART In Task String Queue
 osMessageQId msgQUSARTIn;

@@ -203,6 +203,7 @@ typedef struct
   
   __IO uint32_t            ErrorCode;        /*!< UART Error code
                                                   This parameter can be a value of @ref UART_Error */
+  uint16_t                 RxXferMaxSize;     /* Maximum dynamic buffer to allocate per string rx (appended by Sean Wood)*/
   
 }UART_HandleTypeDef;
 

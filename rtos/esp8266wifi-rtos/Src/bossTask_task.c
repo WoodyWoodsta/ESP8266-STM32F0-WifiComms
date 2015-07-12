@@ -16,6 +16,10 @@
 * @param argument
 */
 void StartBossTask(void const * argument) {
+  // Start receiving data via USB UART
+  cHAL_UART_TermReceive_IT(&huart1, 512);
+  //cHAL_UART_TermReceive_IT(&huart1, 512);
+
   msg_genericMessage_t rxMessage;
   /* Infinite loop */
   for (;;) {
@@ -31,11 +35,11 @@ void StartBossTask(void const * argument) {
       }
       break;
     case MSG_TYPE_COMMAND:
-      if (decodeCommand(&rxMessage) == MSG_COMMAND_LED2_TOGGLE) {
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, SET);
+      if (decodeCommand(&rxMessage) == MSG_COMMAND_LED0_TOGGLE) {
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, SET);
 
       } else {
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, SET);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, SET);
 
       }
       break;
@@ -43,9 +47,9 @@ void StartBossTask(void const * argument) {
       break;
     }
 
-    osDelay(100);
+    osDelay(50);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, RESET);
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, RESET);
 
   }
 }

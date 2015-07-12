@@ -19,6 +19,7 @@
 #define MRSP_HANDLE 1 // Let the library handle the data memory
 
 #define GLOBAL_MESSAGE_MPOOL_SIZE 20 // Maximum number of messages that can exist in memory
+#define STRING_BUFFER_MPOOL_SIZE 10 // Maximum number of string buffer pointer messages that can exist in memory
 
 // == Type Definitions ==
 // Types of messages
@@ -42,7 +43,7 @@ typedef enum {
 typedef enum {
   MSG_CMD_WIFI_SEND_AT,
   MSG_CMD_WIFI_CONNECT_AP,
-  MSG_COMMAND_LED2_TOGGLE
+  MSG_COMMAND_LED0_TOGGLE
 } msgCommand_t;
 
 // Generic message struct to package any associated data
@@ -51,15 +52,23 @@ typedef struct {
   msgSource_t messageSource; // Where did this message come from
   uint8_t mRsp; // Data memory responsibility
   uint32_t dataLength; // Length of the data
-  void *data; // Pointer to data
+  void *data; // Pointer to data TODO Rename this to dataPtr
 } msg_genericMessage_t;
 
+// String pointer message struct to be used for sending to the USART In Task
+typedef struct {
+  msgSource_t messageSource; // Where did this message come from
+  uint16_t stringLength; // Length of the string
+  uint8_t *stringPtr; // Pointer to string
+} msg_stringMessage_t;
+
 // == Message Data Structures ==
-// NOTE: All message types named: msgData_<type of data>_t
+// NOTE: All message types named: data_<type of data>_t
 
 // String data struct
 typedef struct {
   msgType_t messageType;
+  uint16_t stringLength;
   char *stringPtr;
 } data_string_t;
 
@@ -79,6 +88,7 @@ typedef struct {
 
 // == Declarations ==
 osPoolId genericMPool;
+osPoolId strBufMPool;
 
 // == Function Prototypes ==
 void sendMessage(osMessageQId msgQ, msgType_t type, msgSource_t source, uint8_t mRsp, void *data, uint32_t timeout);
