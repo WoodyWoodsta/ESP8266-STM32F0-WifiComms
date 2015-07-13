@@ -23,7 +23,7 @@
 #define RBUF_BUFFER_ENTRIES             20 // Number of entries in the ring buffer
 #define RBUF_ENTRY_PTR_SIZE             sizeof(ringBuf_entry_t *)
 #define RBUF_BUFFER_SIZE                RBUF_BUFFER_ENTRIES * RBUF_ENTRY_PTR_SIZE // Size of the memory for the ring buffer
-#define RBUF_ENTRY_HEADER_SIZE          sizeof(msgSource_t) + sizeof(uint16_t) // Size of a ring buffer entry header
+#define RBUF_ENTRY_HEADER_SIZE          sizeof(ringBuf_entry_t) // Size of a ring buffer entry header
 
 // == Type Definitions ==
 // Types of messages
@@ -113,9 +113,8 @@ typedef struct {
 
 // Definition of the global ring buffer info struct
 typedef struct {
-  ringBuf_entry_t **startPtr;
-  ringBuf_entry_t **outPtr;
-  ringBuf_entry_t **inPtr;
+  uint8_t outPos;
+  uint8_t inPos;
   uint8_t usedEntries;
 } ringBuf_h;
 
@@ -125,6 +124,7 @@ osPoolId strBufMPool;
 
 // == Exported Variables ==
 extern ringBuf_h ringBufHandle;
+extern ringBuf_entry_t *ringBuf[];
 
 // == Function Prototypes ==
 void sendMessage(osMessageQId msgQ, msgType_t type, msgSource_t source, uint8_t mRsp, void *data, uint32_t timeout);
@@ -136,7 +136,7 @@ msgCommand_t decodeCommand(msg_genericMessage_t *messagePtr);
 ringBuf_entry_t *ringBuf_allocEntry(uint16_t stringLength);
 void ringBuf_freeEntry(ringBuf_entry_t *ringBufEntryPtr);
 ringBuf_status_t ringBuf_enqueue(ringBuf_entry_t *ringBufEntryPtr);
-ringBuf_status_t ringBuf_dequeue(ringBuf_entry_t *ringBufEntryPtr);
+ringBuf_status_t ringBuf_dequeue(ringBuf_entry_t **ringBufEntryPtr);
 
 
 #endif /*GENERICMESSAGING_LIB_H*/

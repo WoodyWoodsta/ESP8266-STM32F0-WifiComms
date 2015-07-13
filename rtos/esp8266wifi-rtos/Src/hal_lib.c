@@ -20,6 +20,9 @@ UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart1_tx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
+// == Private Function Declarations ==
+static HAL_StatusTypeDef UART_EndTransmit_IT(UART_HandleTypeDef *huart);
+
 // == Function Definitions ==
 
 /**
@@ -254,6 +257,16 @@ void cHAL_UART_IRQTermHandler(UART_HandleTypeDef *huart) {
     /* Clear RXNE interrupt flag */
     __HAL_UART_SEND_REQ(huart, UART_RXDATA_FLUSH_REQUEST);
   }
+
+  /* UART in mode Transmitter ------------------------------------------------*/
+  if ((__HAL_UART_GET_IT(huart, UART_IT_TXE) != RESET) && (__HAL_UART_GET_IT_SOURCE(huart, UART_IT_TXE) != RESET)) {
+    UART_Transmit_IT(huart);
+  }
+
+  /* UART in mode Transmitter ------------------------------------------------*/
+  if ((__HAL_UART_GET_IT(huart, UART_IT_TC) != RESET) && (__HAL_UART_GET_IT_SOURCE(huart, UART_IT_TC) != RESET)) {
+    UART_EndTransmit_IT(huart);
+  }
 }
 
 /**
@@ -278,7 +291,6 @@ HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
       // If the string is not empty, fire the receive complete callback
       if (RxXferCount != 0) {
         HAL_UART_RxCpltCallback(huart);
-
       }
 
       // Reset string and buffer count
@@ -311,7 +323,7 @@ HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
 
     }
 
-    ((ringBuf_entry_t *)huart->pRxBuffPtr)->string[RxXferCount] = (uint8_t) inChar;
+    ((ringBuf_entry_t *) huart->pRxBuffPtr)->string[RxXferCount] = (uint8_t) inChar;
     huart->RxXferCount = ++RxXferCount; // Update the receive count
     // At this stage, huart->RxXferCount reflects the number of bytes in the buffer
 
@@ -340,8 +352,14 @@ HAL_StatusTypeDef cHAL_USART_sTransmit_DMA(UART_HandleTypeDef *huart, uint8_t *p
     txStatus = HAL_UART_Transmit_DMA(huart, pData, size);
 
     // Check for OK to prevent other checks, else check for errors
-    if (txStatus == HAL_OK) { return HAL_OK; } else if (txStatus == HAL_ERROR) { return HAL_ERROR; } else if (txStatus == HAL_TIMEOUT) { return HAL_TIMEOUT; }
-    osDelay(1); // Do not block other activities TODO Comfirm the need for this
+    if (txStatus == HAL_OK) { 
+      return HAL_OK; 
+    } else if (txStatus == HAL_ERROR) { 
+      return HAL_ERROR; 
+    } else if (txStatus == HAL_TIMEOUT) {
+      return HAL_TIMEOUT; 
+    }
+    osDelay(5); // Do not block other activities TODO Comfirm the need for this
   }
 }
 
@@ -366,8 +384,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     ringBuf_freeEntry(entryPtr);
   }
 
+  //ringBuf_entry_t *dequeueEntryPtr;
+  //ringBuf_dequeue(&dequeueEntryPtr);
+
+  //ringBuf_freeEntry(dequeueEntryPtr);
+
   // Signal the new string
-  osSignalSet(USARTInTaskHandle, RBUF_SIG_UNREAD);
+  osSignalSet(USARTInBufferTaskHandle, RBUF_SIG_UNREAD);
 }
 
 /**
@@ -376,5 +399,51 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 */
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
   // Free the memory held by the string during transmit
-  vPortFree(huart->pTxBuffPtr);
+  vPortFree((ringBuf_entry_t *) (huart->pTxBuffPtr - (sizeof(ringBuf_entry_t) + huart->TxXferSize)));
 }
+
+
+/**
+* @brief  Wraps up transmission in non blocking mode.
+* @param  huart: pointer to a UART_HandleTypeDef structure that contains
+*                the configuration information for the specified UART module.
+* @retval HAL status
+*/
+static HAL_StatusTypeDef UART_EndTransmit_IT(UART_HandleTypeDef *huart) {
+  /* Disable the UART Transmit Complete Interrupt */
+  __HAL_UART_DISABLE_IT(huart, UART_IT_TC);
+
+  /* Check if a receive process is ongoing or not */
+  if (huart->State == HAL_UART_STATE_BUSY_TX_RX) {
+    huart->State = HAL_UART_STATE_BUSY_RX;
+  } else {
+    /* Disable the UART Error Interrupt: (Frame error, noise error, overrun error) */
+    __HAL_UART_DISABLE_IT(huart, UART_IT_ERR);
+
+    huart->State = HAL_UART_STATE_READY;
+  }
+
+  HAL_UART_TxCpltCallback(huart);
+
+  return HAL_OK;
+}
+
+#if !defined(STM32F030x6) && !defined(STM32F030x8)&& !defined(STM32F070xB)&& !defined(STM32F070x6)&& !defined(STM32F030xC)
+/**
+* @brief Initializes the UART wake-up from stop mode parameters when triggered by address detection.
+* @param huart: uart handle
+* @param WakeUpSelection: UART wake up from stop mode parameters
+* @retval HAL status
+*/
+static void UART_Wakeup_AddressConfig(UART_HandleTypeDef *huart, UART_WakeUpTypeDef WakeUpSelection) {
+  /* Check parmeters */
+  assert_param(IS_UART_WAKEUP_INSTANCE(huart->Instance));
+  assert_param(IS_UART_ADDRESSLENGTH_DETECT(WakeUpSelection.AddressLength));
+
+  /* Set the USART address length */
+  MODIFY_REG(huart->Instance->CR2, USART_CR2_ADDM7, WakeUpSelection.AddressLength);
+
+  /* Set the USART address node */
+  MODIFY_REG(huart->Instance->CR2, USART_CR2_ADD, ((uint32_t) WakeUpSelection.Address << UART_CR2_ADDRESS_LSB_POS));
+}
+#endif /* !defined(STM32F030x6) && !defined(STM32F030x8)&& !defined(STM32F070xB)&& !defined(STM32F070x6)&& !defined(STM32F030xC) */

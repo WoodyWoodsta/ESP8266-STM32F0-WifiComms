@@ -14,6 +14,7 @@
 
 // == Exported Variables ==
 ringBuf_h ringBufHandle;
+ringBuf_entry_t *ringBuf[RBUF_BUFFER_ENTRIES];
 
 // == Function Definitions ==
 
@@ -193,7 +194,7 @@ msgCommand_t decodeCommand(msg_genericMessage_t *messagePtr) {
 
 ringBuf_entry_t *ringBuf_allocEntry(uint16_t stringLength) {
   // Allocate the required memory for the entry header as well as the string
-  ringBuf_entry_t *ringBufEntry = pvPortMalloc(sizeof(ringBuf_entry_t) + (stringLength*sizeof(uint8_t)));
+  ringBuf_entry_t *ringBufEntry = pvPortMalloc(sizeof(ringBuf_entry_t) + (stringLength * sizeof(uint8_t)));
 
   if (!ringBufEntry) {
     // TODO: Implement some safety
@@ -215,32 +216,32 @@ ringBuf_status_t ringBuf_enqueue(ringBuf_entry_t *ringBufEntryPtr) {
   }
   
   // Place the entry struct pointer in the available position and update the info
-  *(ringBufHandle.inPtr) = ringBufEntryPtr;
-  ringBufHandle.inPtr += RBUF_ENTRY_PTR_SIZE;
+  ringBuf[ringBufHandle.inPos] = ringBufEntryPtr;
+  ringBufHandle.inPos++;
   ringBufHandle.usedEntries++;
 
   // Check to see if we have wrapped around the ring buffer
-  if (ringBufHandle.inPtr == (ringBufHandle.startPtr + RBUF_BUFFER_SIZE)) {
-    ringBufHandle.inPtr = ringBufHandle.startPtr;
+  if (ringBufHandle.inPos == RBUF_BUFFER_ENTRIES) {
+    ringBufHandle.inPos = 0;
   }
 
   return RBUF_STATUS_OK;
 }
 
-ringBuf_status_t ringBuf_dequeue(ringBuf_entry_t *ringBufEntryPtr) {
+ringBuf_status_t ringBuf_dequeue(ringBuf_entry_t **ringBufEntryPtr) {
   // If the ring buffer is empty, return this as a status
   if (ringBufHandle.usedEntries == 0) {
     return RBUF_STATUS_EMPTY;
   }
 
   // Extract the entry struct pointer from the next used position and update the info
-  ringBufEntryPtr = *(ringBufHandle.inPtr);
-  ringBufHandle.outPtr += RBUF_ENTRY_PTR_SIZE;
+  *ringBufEntryPtr = ringBuf[ringBufHandle.outPos];
+  ringBufHandle.outPos++;
   ringBufHandle.usedEntries--;
 
   // Check to see if we have wrapped around the ring buffer
-  if (ringBufHandle.outPtr == (ringBufHandle.startPtr + RBUF_BUFFER_SIZE)) {
-    ringBufHandle.outPtr = ringBufHandle.startPtr;
+  if (ringBufHandle.outPos == RBUF_BUFFER_ENTRIES) {
+    ringBufHandle.outPos = 0;
   }
 
   return RBUF_STATUS_OK;

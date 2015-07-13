@@ -18,27 +18,49 @@ void ringBufferInit(void);
 */
 void StartUSARTInBufferTask(void const * argument) {
   ringBufferInit();
-  osEvent rxSigEvent;
+  ringBuf_entry_t *ringBufRxEntryPtr;
 
   for (;;) {
-    rxSigEvent = osSignalWait(RBUF_SIG_UNREAD, osWaitForever);
+    // Wait forever for the unread ring buffer entries signal
+    osEvent sigRxEvent = osSignalWait(RBUF_SIG_UNREAD, osWaitForever);
 
-    if (rxSigEvent.status == osEventSignal) {
+    if (sigRxEvent.status == osEventSignal) {
+      // Grab the pointer to the new entry
+      ringBuf_status_t status = ringBuf_dequeue(&ringBufRxEntryPtr); // TODO: This call does not necessarily protect against stomping
 
+      if (status == RBUF_STATUS_OK) {
+        //HAL_StatusTypeDef status = cHAL_USART_sTransmit_DMA(&huart1, ringBufRxEntryPtr->string, ringBufRxEntryPtr->stringLength);
+        //if (status != HAL_OK) {
+        //  ringBuf_freeEntry(ringBufRxEntryPtr);
+        //}
+
+        // Allocate memory for the string message
+        msg_stringMessage_t *txMessagePtr = osPoolAlloc(strBufMPool);
+
+        // Fill the string message struct
+        txMessagePtr->messageSource = ringBufRxEntryPtr->stringSource;
+        txMessagePtr->stringLength = ringBufRxEntryPtr->stringLength;
+        txMessagePtr->stringPtr = (uint8_t *) ringBufRxEntryPtr->string;
+
+        // Send the message to USARTInTask
+        osStatus status = osMessagePut(msgQUSARTIn, (uint32_t) txMessagePtr, 0);
+
+        // If the message did not send, free the memories
+        if (status != osOK) {
+          ringBuf_freeEntry(ringBufRxEntryPtr);
+          osPoolFree(strBufMPool, txMessagePtr);
+        }
+      }
     }
-    osDelay(1);
   }
 }
 
 
 // TODO: Consider moving this to genericMessaging_lib
 void ringBufferInit(void) {
-  // Malloc the required amount of memory for the ring buffer
-  ringBufHandle.startPtr = pvPortMalloc(RBUF_BUFFER_SIZE);
-  ringBufHandle.inPtr = ringBufHandle.startPtr;
-  ringBufHandle.outPtr = ringBufHandle.startPtr;
-
-  // Reset the used entries (buffer is empty)
+  // Reset the ring buffer handle
+  ringBufHandle.inPos = 0;
+  ringBufHandle.outPos = 0;
   ringBufHandle.usedEntries = 0;
 
 }

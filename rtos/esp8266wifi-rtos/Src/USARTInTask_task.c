@@ -36,11 +36,11 @@ void StartUSARTInTask(void const * argument) {
 
 void interpretString(msg_stringMessage_t *stringMessageInPtr) {
   if (wifiCommState == COMM_STATE_MANUAL) {
-    HAL_StatusTypeDef status = cHAL_USART_sTransmit_DMA(&huart1, stringMessageInPtr->stringPtr, stringMessageInPtr->stringLength);
+    HAL_StatusTypeDef status = HAL_UART_Transmit_IT(&huart1, stringMessageInPtr->stringPtr, stringMessageInPtr->stringLength);
 
     // If we run into issues, get rid of the string
-    if (status != HAL_OK) {
-      vPortFree(stringMessageInPtr->stringPtr);
+    if (status != osOK) {
+      vPortFree((ringBuf_entry_t *) (stringMessageInPtr->stringPtr - sizeof(ringBuf_entry_t)));
     }
   }
 }
