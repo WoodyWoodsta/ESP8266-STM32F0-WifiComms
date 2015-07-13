@@ -18,8 +18,14 @@ void ringBufferInit(void);
 */
 void StartUSARTInBufferTask(void const * argument) {
   ringBufferInit();
+  osEvent rxSigEvent;
 
   for (;;) {
+    rxSigEvent = osSignalWait(RBUF_SIG_UNREAD, osWaitForever);
+
+    if (rxSigEvent.status == osEventSignal) {
+
+    }
     osDelay(1);
   }
 }

@@ -347,7 +347,7 @@ HAL_StatusTypeDef cHAL_USART_sTransmit_DMA(UART_HandleTypeDef *huart, uint8_t *p
 
 /**
 * @brief USART callback on receiving a completed string (terminated)
-*        This callback is hardcoded to send the string buffer info to the USART In task
+*        This callback is hardcoded to place the string in a ring buffer and signal to USARTInBufferTask to deal with it
 * @param *huart: Pointer to UART handle
 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {

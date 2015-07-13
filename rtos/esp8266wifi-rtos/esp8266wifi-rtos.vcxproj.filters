@@ -92,68 +92,68 @@
     <Filter Include="Header files\Inc">
       <UniqueIdentifier>{4e537095-c208-4f86-ad83-6edd66f32fec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source files\Middlewares">
-      <UniqueIdentifier>{6cb00487-447b-4654-b739-d1b2e65abb47}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header files\Middlewares">
-      <UniqueIdentifier>{9c9f23b0-ce97-4946-a679-6c55afa7bef3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source files\Middlewares\Third_Party">
-      <UniqueIdentifier>{bc107b27-e660-422c-922d-96227f29b993}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header files\Middlewares\Third_Party">
-      <UniqueIdentifier>{136f4943-7b9e-47a5-abc0-18f1a98bffc7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source files\Middlewares\Third_Party\FreeRTOS">
-      <UniqueIdentifier>{8af6a3b8-ec3e-4a23-8264-ff3bbf048424}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header files\Middlewares\Third_Party\FreeRTOS">
-      <UniqueIdentifier>{ff398aa7-2581-435d-abcc-e61b9c802967}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source files\Middlewares\Third_Party\FreeRTOS\Source">
-      <UniqueIdentifier>{c90d6fef-8473-4c91-b914-22de49b6d857}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header files\Middlewares\Third_Party\FreeRTOS\Source">
-      <UniqueIdentifier>{aeaba7e0-12f7-4cee-b547-59ff3b25b331}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source files\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS">
-      <UniqueIdentifier>{55c8d0ad-c76f-490c-aab0-4c8dde9433b8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header files\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS">
-      <UniqueIdentifier>{6fffe444-8a68-491a-be64-30976d8d4876}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source files\Middlewares\Third_Party\FreeRTOS\Source\include">
-      <UniqueIdentifier>{5cde245a-0e40-47fd-ae58-91a430c27cf7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header files\Middlewares\Third_Party\FreeRTOS\Source\include">
-      <UniqueIdentifier>{c8a269ed-51fd-4ffa-8c9d-38d833182130}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source files\Middlewares\Third_Party\FreeRTOS\Source\portable">
-      <UniqueIdentifier>{a9844d1e-8453-4589-91f7-249c7bc2ab88}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header files\Middlewares\Third_Party\FreeRTOS\Source\portable">
-      <UniqueIdentifier>{795a48e4-1826-4db2-916f-cdb724fd477a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source files\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC">
-      <UniqueIdentifier>{6919ad63-f921-46f4-a282-e754fe31f2c3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header files\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC">
-      <UniqueIdentifier>{efc2870d-b066-455c-ae39-4ff22d6fcda1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source files\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM0">
-      <UniqueIdentifier>{dcd89951-9c7a-4d4a-b2a7-6c73dd68abee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header files\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM0">
-      <UniqueIdentifier>{03f6e679-f849-4ee1-b5b5-51639ecb2b0b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source files\Middlewares\Third_Party\FreeRTOS\Source\portable\MemMang">
-      <UniqueIdentifier>{3323fbbd-dda7-4a81-b52f-8396a5edbc73}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header files\Middlewares\Third_Party\FreeRTOS\Source\portable\MemMang">
-      <UniqueIdentifier>{e28e35de-f08f-47f6-bcf8-7a544bdacd03}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source files\Src">
       <UniqueIdentifier>{373922aa-c908-4952-bae1-c7213c105445}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Middlewares">
+      <UniqueIdentifier>{da71c303-4ecf-4e2b-83a0-caf316cc4131}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Middlewares">
+      <UniqueIdentifier>{e0efd2cb-b8a8-47d4-a498-e1a8b684ec8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Middlewares\Third_Party">
+      <UniqueIdentifier>{48ee777b-a391-43fb-a5f4-6b0b2c3162d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Middlewares\Third_Party">
+      <UniqueIdentifier>{1172aa7a-d18a-4bca-8790-5ccef4631a38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Middlewares\Third_Party\FreeRTOS">
+      <UniqueIdentifier>{815c5d85-895b-4dcc-8f07-a97182411e9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Middlewares\Third_Party\FreeRTOS">
+      <UniqueIdentifier>{844e5cc5-c96d-4ed4-8dbb-d15558f36eb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Middlewares\Third_Party\FreeRTOS\Source">
+      <UniqueIdentifier>{63d6631b-f2d2-43f8-95bd-14cc170097a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Middlewares\Third_Party\FreeRTOS\Source">
+      <UniqueIdentifier>{4d2f8847-f242-4bbf-95b5-14e4f0753f30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS">
+      <UniqueIdentifier>{1a872063-84d8-4e60-be69-ed1cf699e79b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS">
+      <UniqueIdentifier>{7d0d8994-5f9d-4bca-bcf2-f7dd951367d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Middlewares\Third_Party\FreeRTOS\Source\include">
+      <UniqueIdentifier>{6ffd52fc-06fd-4a74-aebb-4025280e2129}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Middlewares\Third_Party\FreeRTOS\Source\include">
+      <UniqueIdentifier>{1e4e3504-2c4c-4df5-8551-54cab4c69cd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Middlewares\Third_Party\FreeRTOS\Source\portable">
+      <UniqueIdentifier>{7198c3aa-179c-4af0-9126-e3d17a0a0b3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Middlewares\Third_Party\FreeRTOS\Source\portable">
+      <UniqueIdentifier>{fcaab779-9bb0-4f43-bb07-83a5f2e1f208}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC">
+      <UniqueIdentifier>{23fb9f53-95ae-4d3d-a658-90acc6947ada}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC">
+      <UniqueIdentifier>{5df612fe-ebfd-4e34-a405-068c87e270bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM0">
+      <UniqueIdentifier>{b78532e8-aedd-404c-86cf-b66a596625ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM0">
+      <UniqueIdentifier>{3a2b0378-8414-4ad1-a4c0-07995977ef0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Middlewares\Third_Party\FreeRTOS\Source\portable\MemMang">
+      <UniqueIdentifier>{e4280ef9-4bfa-42e0-b28a-1853f54c285a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Middlewares\Third_Party\FreeRTOS\Source\portable\MemMang">
+      <UniqueIdentifier>{412263cf-8f76-4434-8332-9816c143215a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -314,10 +314,25 @@
     <ClInclude Include="Inc\stm32f0xx_it.h">
       <Filter>Header files\Inc</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\hal_lib.h">
+      <Filter>Header files\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\userTasks_task.h">
+      <Filter>Header files\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\genericMessaging_lib.h">
+      <Filter>Header files\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\strings_res.h">
+      <Filter>Header files\Inc</Filter>
+    </ClInclude>
     <ClInclude Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS\cmsis_os.h">
       <Filter>Header files\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS</Filter>
     </ClInclude>
     <ClInclude Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\include\croutine.h">
+      <Filter>Header files\Middlewares\Third_Party\FreeRTOS\Source\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\include\deprecated_definitions.h">
       <Filter>Header files\Middlewares\Third_Party\FreeRTOS\Source\include</Filter>
     </ClInclude>
     <ClInclude Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\include\event_groups.h">
@@ -358,18 +373,6 @@
     </ClInclude>
     <ClInclude Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM0\portmacro.h">
       <Filter>Header files\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM0</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\hal_lib.h">
-      <Filter>Header files\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\userTasks_task.h">
-      <Filter>Header files\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\genericMessaging_lib.h">
-      <Filter>Header files\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\strings_res.h">
-      <Filter>Header files\Inc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -412,33 +415,6 @@
     <ClCompile Include="Lib\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_hal_uart_ex.c">
       <Filter>Source files\Drivers\STM32F0xx_HAL_Driver\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\croutine.c">
-      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\event_groups.c">
-      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\list.c">
-      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\queue.c">
-      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\tasks.c">
-      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\timers.c">
-      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS\cmsis_os.c">
-      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS</Filter>
-    </ClCompile>
-    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM0\port.c">
-      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM0</Filter>
-    </ClCompile>
-    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\portable\MemMang\heap_4.c">
-      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source\portable\MemMang</Filter>
-    </ClCompile>
     <ClCompile Include="Src\freertos.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
@@ -477,6 +453,33 @@
     </ClCompile>
     <ClCompile Include="Src\USARTInBufferTask_task.c">
       <Filter>Source files\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\croutine.c">
+      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\event_groups.c">
+      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\list.c">
+      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\queue.c">
+      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\tasks.c">
+      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\timers.c">
+      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS\cmsis_os.c">
+      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM0\port.c">
+      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM0</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\portable\MemMang\heap_4.c">
+      <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source\portable\MemMang</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
