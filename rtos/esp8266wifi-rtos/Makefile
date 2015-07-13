@@ -34,7 +34,7 @@ error:
 	$(error Invalid configuration, please check your inputs)
 endif
 
-SOURCEFILES := Src/bossTask_task.c Lib/Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates/startup_stm32f0xx.c Lib/Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates/system_stm32f0xx.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_dma.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash_ex.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc_ex.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart_ex.c Lib/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c Lib/Middlewares/Third_Party/FreeRTOS/Source/croutine.c Lib/Middlewares/Third_Party/FreeRTOS/Source/event_groups.c Lib/Middlewares/Third_Party/FreeRTOS/Source/list.c Lib/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM0/port.c Lib/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c Lib/Middlewares/Third_Party/FreeRTOS/Source/queue.c Lib/Middlewares/Third_Party/FreeRTOS/Source/tasks.c Lib/Middlewares/Third_Party/FreeRTOS/Source/timers.c Src/freertos.c Src/genericMessaging_lib.c Src/hal_lib.c Src/main.c Src/stm32f0xx_hal_msp.c Src/stm32f0xx_it.c Src/strings_res.c Src/USARTInTask_task.c Src/USARTOutTask_task.c Src/userTasks_task.c
+SOURCEFILES := Src/bossTask_task.c Lib/Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates/startup_stm32f0xx.c Lib/Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates/system_stm32f0xx.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_dma.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash_ex.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc_ex.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c Lib/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart_ex.c Lib/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c Lib/Middlewares/Third_Party/FreeRTOS/Source/croutine.c Lib/Middlewares/Third_Party/FreeRTOS/Source/event_groups.c Lib/Middlewares/Third_Party/FreeRTOS/Source/list.c Lib/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM0/port.c Lib/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c Lib/Middlewares/Third_Party/FreeRTOS/Source/queue.c Lib/Middlewares/Third_Party/FreeRTOS/Source/tasks.c Lib/Middlewares/Third_Party/FreeRTOS/Source/timers.c Src/freertos.c Src/genericMessaging_lib.c Src/hal_lib.c Src/main.c Src/stm32f0xx_hal_msp.c Src/stm32f0xx_it.c Src/strings_res.c Src/USARTInBufferTask_task.c Src/USARTInTask_task.c Src/USARTOutTask_task.c Src/userTasks_task.c
 EXTERNAL_LIBS := 
 EXTERNAL_LIBS_COPIED := $(foreach lib, $(EXTERNAL_LIBS),$(BINARYDIR)/$(notdir $(lib)))
 
@@ -297,6 +297,10 @@ $(BINARYDIR)/stm32f0xx_it.o : Src/stm32f0xx_it.c $(all_make_files) |$(BINARYDIR)
 
 
 $(BINARYDIR)/strings_res.o : Src/strings_res.c $(all_make_files) |$(BINARYDIR)
+	$(CC) $(CFLAGS) -c $< -o $@ -MD -MF $(@:.o=.dep)
+
+
+$(BINARYDIR)/USARTInBufferTask_task.o : Src/USARTInBufferTask_task.c $(all_make_files) |$(BINARYDIR)
 	$(CC) $(CFLAGS) -c $< -o $@ -MD -MF $(@:.o=.dep)
 
 

@@ -30,6 +30,7 @@ typedef enum {
 // == Exported Variables ==
 extern osThreadId bossTaskHandle;
 extern osThreadId USARTInTaskHandle;
+extern osThreadId USARTInBufferTaskHandle;
 extern osThreadId USARTOutTaskHandle;
 extern commState_t wifiCommState;
 
@@ -46,6 +47,7 @@ extern osMessageQId msgQBoss;
 // == Function Prototypes ==
 void StartBossTask(void const * argument);
 void StartUSARTInTask(void const * argument);
+void StartUSARTInBufferTask(void const * argument);
 void StartUSARTOutTask(void const * argument);
 
 #endif /*USERTASKS_TASK_H*/

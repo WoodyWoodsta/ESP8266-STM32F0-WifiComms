@@ -475,5 +475,8 @@
     <ClCompile Include="Src\strings_res.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
+    <ClCompile Include="Src\USARTInBufferTask_task.c">
+      <Filter>Source files\Src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

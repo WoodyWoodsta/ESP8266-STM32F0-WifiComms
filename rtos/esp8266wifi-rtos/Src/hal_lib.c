@@ -265,7 +265,7 @@ void cHAL_UART_IRQTermHandler(UART_HandleTypeDef *huart) {
 */
 HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
   uint16_t uhMask = huart->Mask;
-  uint16_t RxXferSize = huart->RxXferSize;
+  uint16_t RxXferSize = huart->RxXferSize; // Total allocated string buffer length (NOTE: This is not the memory allocated to the entire ringBuffer_entry)
   uint16_t RxXferCount = huart->RxXferCount;
 
   if ((huart->State == HAL_UART_STATE_BUSY_TX_RX) || (huart->State == HAL_UART_STATE_BUSY_RX) || (huart->State == HAL_UART_STATE_READY)) {
@@ -295,23 +295,23 @@ HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
       RxXferSize += USART_DYNAMIC_BUFFER_INCREMENT;
 
       // Create a new pointer and allocate the new memory required
-      uint8_t *newPtr = pvPortMalloc(RxXferSize);
+      ringBuf_entry_t *newPtr = ringBuf_allocEntry(RxXferSize);
 
       // Copy in and free the existing buffer, only if this is not the first allocation of the string
       // NOTE: This is because the pointer to the previous string may still be used elsewhere
       if (RxXferSize != USART_DYNAMIC_BUFFER_INCREMENT) {
-        memcpy(newPtr, huart->pRxBuffPtr, RxXferCount);
-        vPortFree(huart->pRxBuffPtr);
+        memcpy(newPtr, huart->pRxBuffPtr, (RxXferCount + RBUF_ENTRY_HEADER_SIZE));
+        ringBuf_freeEntry((ringBuf_entry_t *) huart->pRxBuffPtr);
 
       }
 
-      // Re-assign the handle's rx buffer pointer to the new pointer
+      // Re-assign the handle's rx buffer pointer to the new pointer and update total string buffer length
       huart->pRxBuffPtr = newPtr;
       huart->RxXferSize = RxXferSize;
 
     }
 
-    huart->pRxBuffPtr[RxXferCount] = (uint8_t) inChar;
+    ((ringBuf_entry_t *)huart->pRxBuffPtr)->string[RxXferCount] = (uint8_t) inChar;
     huart->RxXferCount = ++RxXferCount; // Update the receive count
     // At this stage, huart->RxXferCount reflects the number of bytes in the buffer
 
@@ -351,38 +351,23 @@ HAL_StatusTypeDef cHAL_USART_sTransmit_DMA(UART_HandleTypeDef *huart, uint8_t *p
 * @param *huart: Pointer to UART handle
 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-  msg_stringMessage_t *txMessagePtr;
-  uint8_t charBuf[128];
+  ringBuf_entry_t *entryPtr = (ringBuf_entry_t *) huart->pRxBuffPtr;
 
-  // Allocate a block in the string buffer pool for the message
-  txMessagePtr = osPoolAlloc(strBufMPool);
-  if (txMessagePtr == NULL) {
-    vPortFree(txMessagePtr->stringPtr);
-    return;
-  }
-
-  // Identify the source
+  // Fill the ring buffer entry header
+  entryPtr->stringLength = huart->RxXferCount;
   if (huart->Instance == USART1_BASE) {
-    txMessagePtr->messageSource = MSG_SRC_USB;
-  } else { txMessagePtr->messageSource = MSG_SRC_WIFI; }
-
-  // Fill the message struct
-  txMessagePtr->stringLength = huart->RxXferCount;
-  txMessagePtr->stringPtr = huart->pRxBuffPtr;
-
-  // Send the string message!
-  uint32_t i = 0;
-  for (i = 0; i < 100; i++) {
-    __asm("nop");
+    entryPtr->stringSource = MSG_SRC_USB;
+  } else {
+    entryPtr->stringSource = MSG_SRC_WIFI;
   }
-  //osStatus status = osMessagePut(msgQUSARTIn, (uint32_t) txMessagePtr, 0);
 
-  // If we did not succeed with the message send, free the message and the string
-  //if (status != osOK) {
-    vPortFree(txMessagePtr->stringPtr);
-    osPoolFree(strBufMPool, txMessagePtr);
-  //}
+  // Enqueue the entry, if the buffer is full, lose the string
+  if (ringBuf_enqueue(entryPtr) == RBUF_STATUS_FULL) {
+    ringBuf_freeEntry(entryPtr);
+  }
 
+  // Signal the new string
+  osSignalSet(USARTInTaskHandle, RBUF_SIG_UNREAD);
 }
 
 /**

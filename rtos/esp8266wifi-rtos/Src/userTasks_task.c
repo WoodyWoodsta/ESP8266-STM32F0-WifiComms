@@ -13,6 +13,7 @@
 // == Exported Variables ==
 osThreadId bossTaskHandle;
 osThreadId USARTInTaskHandle;
+osThreadId USARTInBufferTaskHandle;
 osThreadId USARTOutTaskHandle;
 commState_t wifiCommState = COMM_STATE_MANUAL;
 

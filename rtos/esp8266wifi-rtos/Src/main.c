@@ -89,6 +89,9 @@ int main(void) {
   osThreadDef(USARTInTask, StartUSARTInTask, osPriorityNormal, 0, 128);
   USARTInTaskHandle = osThreadCreate(osThread(USARTInTask), NULL);
 
+  osThreadDef(USARTInBufferTask, StartUSARTInBufferTask, osPriorityAboveNormal, 0, 64);
+  USARTInBufferTaskHandle = osThreadCreate(osThread(USARTInBufferTask), NULL);
+
   osThreadDef(USARTOutTask, StartUSARTOutTask, osPriorityNormal, 0, 128);
   USARTOutTaskHandle = osThreadCreate(osThread(USARTOutTask), NULL);
 
