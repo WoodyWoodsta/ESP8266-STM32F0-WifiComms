@@ -9,7 +9,7 @@
 #include "userTasks_task.h"
 
 // == Function Declarations ==
-void interpretString(msg_stringMessage_t *stringMessageInPtr);
+void interpretUSBString(msg_stringMessage_t *stringMessageInPtr);
 void fetchString(msg_stringMessage_t *messagePtr);
 
 // == Function Definitions ==
@@ -26,21 +26,33 @@ void StartUSARTInTask(void const * argument) {
 
     switch (messageRx.messageSource) {
     case MSG_SRC_USB:
-      interpretString(&messageRx);
+      interpretUSBString(&messageRx);
+      break;
+    case MSG_SRC_WIFI:
+      interpretWifiString(&messageRx);
+      break;
     }
-
-    osDelay(1);
-
   }
 }
 
-void interpretString(msg_stringMessage_t *stringMessageInPtr) {
+void interpretUSBString(msg_stringMessage_t *stringMessageInPtr) {
+  if (wifiCommState == COMM_STATE_MANUAL) {
+    HAL_StatusTypeDef status = HAL_UART_Transmit_IT(&huart2, stringMessageInPtr->stringPtr, stringMessageInPtr->stringLength);
+
+    // If we run into issues, get rid of the string
+    if (status != osOK) {
+      vPortFree(stringMessageInPtr->stringPtr);
+    }
+  }
+}
+
+void interpretWifiString(msg_stringMessage_t *stringMessageInPtr) {
   if (wifiCommState == COMM_STATE_MANUAL) {
     HAL_StatusTypeDef status = HAL_UART_Transmit_IT(&huart1, stringMessageInPtr->stringPtr, stringMessageInPtr->stringLength);
 
     // If we run into issues, get rid of the string
     if (status != osOK) {
-      vPortFree((ringBuf_entry_t *) (stringMessageInPtr->stringPtr - sizeof(ringBuf_entry_t)));
+      vPortFree(stringMessageInPtr->stringPtr);
     }
   }
 }

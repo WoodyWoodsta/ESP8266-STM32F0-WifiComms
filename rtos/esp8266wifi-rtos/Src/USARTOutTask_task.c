@@ -21,7 +21,7 @@ void StartUSARTOutTask(void const * argument) {
     sendCommand(msgQBoss, MSG_SRC_USART_OUT_TASK, MSG_COMMAND_LED0_TOGGLE, osWaitForever);
 
     freeHeap = xPortGetFreeHeapSize();
-    osDelay(500);
+    osDelay(100);
   
   }
 

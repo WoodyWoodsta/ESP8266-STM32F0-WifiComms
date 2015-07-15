@@ -1313,7 +1313,7 @@ HAL_StatusTypeDef UART_Transmit_IT(UART_HandleTypeDef *huart)
 {
   uint16_t* tmp;
   
-  if ((huart->State == HAL_UART_STATE_BUSY_TX) || (huart->State == HAL_UART_STATE_BUSY_TX_RX))
+  if ((huart->State == HAL_UART_STATE_BUSY_TX) || (huart->State == HAL_UART_STATE_BUSY_TX_RX) || (huart->State == HAL_UART_STATE_READY))
   {
  
     if(huart->TxXferCount == 0)

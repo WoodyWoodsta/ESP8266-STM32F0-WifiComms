@@ -18,7 +18,7 @@
 void StartBossTask(void const * argument) {
   // Start receiving data via USB UART
   cHAL_UART_TermReceive_IT(&huart1, 512);
-  //cHAL_UART_TermReceive_IT(&huart1, 512);
+  cHAL_UART_TermReceive_IT(&huart2, 512);
 
   msg_genericMessage_t rxMessage;
   /* Infinite loop */
@@ -47,7 +47,7 @@ void StartBossTask(void const * argument) {
       break;
     }
 
-    osDelay(50);
+    osDelay(25);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, RESET);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, RESET);
 

@@ -44,7 +44,7 @@ osPoolDef(genericMPool, GLOBAL_MESSAGE_MPOOL_SIZE, msg_genericMessage_t);
 osPoolDef(strBufMPool, STRING_BUFFER_MPOOL_SIZE, msg_stringMessage_t);
 
 // USART In Task String Queue
-osMessageQDef(msgQUSARTIn, 5, msg_stringMessage_t);
+osMessageQDef(msgQUSARTIn, STRING_BUFFER_MPOOL_SIZE, msg_stringMessage_t);
 
 // USART Out Task Message Queue
 osMessageQDef(msgQUSARTOut, 2, msg_genericMessage_t);
@@ -88,9 +88,6 @@ int main(void) {
 
   osThreadDef(USARTInTask, StartUSARTInTask, osPriorityNormal, 0, 128);
   USARTInTaskHandle = osThreadCreate(osThread(USARTInTask), NULL);
-
-  osThreadDef(USARTInBufferTask, StartUSARTInBufferTask, osPriorityAboveNormal, 0, 64);
-  USARTInBufferTaskHandle = osThreadCreate(osThread(USARTInBufferTask), NULL);
 
   osThreadDef(USARTOutTask, StartUSARTOutTask, osPriorityNormal, 0, 128);
   USARTOutTaskHandle = osThreadCreate(osThread(USARTOutTask), NULL);

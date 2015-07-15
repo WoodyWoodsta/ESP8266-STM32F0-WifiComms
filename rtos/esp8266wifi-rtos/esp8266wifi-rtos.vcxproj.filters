@@ -451,9 +451,6 @@
     <ClCompile Include="Src\strings_res.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Src\USARTInBufferTask_task.c">
-      <Filter>Source files\Src</Filter>
-    </ClCompile>
     <ClCompile Include="Lib\Middlewares\Third_Party\FreeRTOS\Source\croutine.c">
       <Filter>Source files\Middlewares\Third_Party\FreeRTOS\Source</Filter>
     </ClCompile>

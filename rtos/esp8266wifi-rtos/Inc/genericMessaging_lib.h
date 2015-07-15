@@ -18,12 +18,8 @@
 #define MRSP_NO_HANDLE 0 // Do not let the library handle the data memory
 #define MRSP_HANDLE 1 // Let the library handle the data memory
 
-#define GLOBAL_MESSAGE_MPOOL_SIZE       20 // Maximum number of messages that can exist in memory
-#define STRING_BUFFER_MPOOL_SIZE        10 // Maximum number of string buffer pointer messages that can exist in memory
-#define RBUF_BUFFER_ENTRIES             20 // Number of entries in the ring buffer
-#define RBUF_ENTRY_PTR_SIZE             sizeof(ringBuf_entry_t *)
-#define RBUF_BUFFER_SIZE                RBUF_BUFFER_ENTRIES * RBUF_ENTRY_PTR_SIZE // Size of the memory for the ring buffer
-#define RBUF_ENTRY_HEADER_SIZE          sizeof(ringBuf_entry_t) // Size of a ring buffer entry header
+#define GLOBAL_MESSAGE_MPOOL_SIZE   20 // Maximum number of messages that can exist in memory
+#define STRING_BUFFER_MPOOL_SIZE    10 // Maximum number of string buffer pointer messages that can exist in memory
 
 // == Type Definitions ==
 // Types of messages
@@ -90,41 +86,9 @@ typedef struct {
   msgCommand_t command;
 } data_command_t;
 
-// == Ring Buffer Typedefs ==
-// Signals to send to the USARTInBufferTask from the interrupt
-typedef enum {
-  RBUF_SIG_READ,
-  RBUF_SIG_UNREAD
-} ringBuf_signal_t;
-
-typedef enum {
-  RBUF_STATUS_OK,
-  RBUF_STATUS_FULL,
-  RBUF_STATUS_EMPTY,
-  RBUF_STATUS_ERROR
-} ringBuf_status_t;
-
-// Definition of an entry into the 
-typedef struct {
-  msgSource_t stringSource;
-  uint16_t stringLength;
-  uint8_t string[];
-} ringBuf_entry_t;
-
-// Definition of the global ring buffer info struct
-typedef struct {
-  uint8_t outPos;
-  uint8_t inPos;
-  uint8_t usedEntries;
-} ringBuf_h;
-
 // == Declarations ==
 osPoolId genericMPool;
 osPoolId strBufMPool;
-
-// == Exported Variables ==
-extern ringBuf_h ringBufHandle;
-extern ringBuf_entry_t *ringBuf[];
 
 // == Function Prototypes ==
 void sendMessage(osMessageQId msgQ, msgType_t type, msgSource_t source, uint8_t mRsp, void *data, uint32_t timeout);
@@ -132,11 +96,5 @@ void sendCommand(osMessageQId msgQ, msgSource_t source, msgCommand_t command, ui
 void fetchMessage(osMessageQId msgQ, msg_genericMessage_t *messagePtr, uint32_t timeout);
 void *decodeMessage(msg_genericMessage_t *messagePtr, void *dataStruct);
 msgCommand_t decodeCommand(msg_genericMessage_t *messagePtr);
-
-ringBuf_entry_t *ringBuf_allocEntry(uint16_t stringLength);
-void ringBuf_freeEntry(ringBuf_entry_t *ringBufEntryPtr);
-ringBuf_status_t ringBuf_enqueue(ringBuf_entry_t *ringBufEntryPtr);
-ringBuf_status_t ringBuf_dequeue(ringBuf_entry_t **ringBufEntryPtr);
-
 
 #endif /*GENERICMESSAGING_LIB_H*/

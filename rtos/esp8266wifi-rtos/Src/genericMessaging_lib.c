@@ -12,10 +12,6 @@
 // == Includes ==
 #include "genericMessaging_lib.h"
 
-// == Exported Variables ==
-ringBuf_h ringBufHandle;
-ringBuf_entry_t *ringBuf[RBUF_BUFFER_ENTRIES];
-
 // == Function Definitions ==
 
 // TODO Add functionality to send strings from anywhere else (in addition to the specialised string methods for the USART IRQ)
@@ -189,60 +185,4 @@ msgCommand_t decodeCommand(msg_genericMessage_t *messagePtr) {
   vPortFree(commandStructRxPtr);
 
   return commandRx;
-}
-
-
-ringBuf_entry_t *ringBuf_allocEntry(uint16_t stringLength) {
-  // Allocate the required memory for the entry header as well as the string
-  ringBuf_entry_t *ringBufEntry = pvPortMalloc(sizeof(ringBuf_entry_t) + (stringLength * sizeof(uint8_t)));
-
-  if (!ringBufEntry) {
-    // TODO: Implement some safety
-  }
-
-  // Return the pointer to the new buffer entry
-  return ringBufEntry;
-}
-
-void ringBuf_freeEntry(ringBuf_entry_t *ringBufEntryPtr) {
-  // Free the entry
-  vPortFree(ringBufEntryPtr);
-}
-
-ringBuf_status_t ringBuf_enqueue(ringBuf_entry_t *ringBufEntryPtr) {
-  // If the ring buffer is full, return this as a status
-  if (ringBufHandle.usedEntries == RBUF_BUFFER_ENTRIES) {
-    return RBUF_STATUS_FULL;
-  }
-  
-  // Place the entry struct pointer in the available position and update the info
-  ringBuf[ringBufHandle.inPos] = ringBufEntryPtr;
-  ringBufHandle.inPos++;
-  ringBufHandle.usedEntries++;
-
-  // Check to see if we have wrapped around the ring buffer
-  if (ringBufHandle.inPos == RBUF_BUFFER_ENTRIES) {
-    ringBufHandle.inPos = 0;
-  }
-
-  return RBUF_STATUS_OK;
-}
-
-ringBuf_status_t ringBuf_dequeue(ringBuf_entry_t **ringBufEntryPtr) {
-  // If the ring buffer is empty, return this as a status
-  if (ringBufHandle.usedEntries == 0) {
-    return RBUF_STATUS_EMPTY;
-  }
-
-  // Extract the entry struct pointer from the next used position and update the info
-  *ringBufEntryPtr = ringBuf[ringBufHandle.outPos];
-  ringBufHandle.outPos++;
-  ringBufHandle.usedEntries--;
-
-  // Check to see if we have wrapped around the ring buffer
-  if (ringBufHandle.outPos == RBUF_BUFFER_ENTRIES) {
-    ringBufHandle.outPos = 0;
-  }
-
-  return RBUF_STATUS_OK;
 }
