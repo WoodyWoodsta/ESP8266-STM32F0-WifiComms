@@ -2,6 +2,7 @@
   * ============================================================================
   * File Name          : bossTask_task.c
   * Description        : Boss Task Body
+  * Author             : Sean Wood
   * ============================================================================
   */
 
@@ -33,15 +34,13 @@ void StartBossTask(void const * argument) {
           GPIOB->ODR = rxData.z;
         }
       }
+
       break;
     case MSG_TYPE_COMMAND:
       if (decodeCommand(&rxMessage) == MSG_COMMAND_LED0_TOGGLE) {
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, SET);
-
-      } else {
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, SET);
-
       }
+
       break;
     default:
       break;
@@ -49,7 +48,6 @@ void StartBossTask(void const * argument) {
 
     osDelay(25);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, RESET);
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, RESET);
 
   }
 }

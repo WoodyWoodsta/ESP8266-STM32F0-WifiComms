@@ -25,7 +25,7 @@
 * @param *data: Pointer to the struct holding the message data
 * @param timeout: How long the operating system must wait until the message is successfully placed in message Q msgQ
 */
-void sendMessage(osMessageQId msgQ, msgType_t type, msgSource_t source, uint8_t mRsp, void *data, uint32_t timeout) {
+void sendMessage(osMessageQId msgQ, msgType_t type, msgSource_t source, uint8_t mRsp, void *pData, uint32_t timeout) {
   uint32_t dataLength; // Length of the data to be linked in
   msg_genericMessage_t *messageTxPtr;
   void *dataContentPtr;
@@ -36,7 +36,7 @@ void sendMessage(osMessageQId msgQ, msgType_t type, msgSource_t source, uint8_t 
   // Identify the size of the data that will be linked in based on the data struct used
   switch (type) {
   case MSG_TYPE_STRING:
-    dataLength = *((uint16_t *) data) + sizeof(uint16_t);
+    dataLength = *((uint16_t *) pData) + sizeof(uint16_t);
     break;
 
   case MSG_TYPE_COMMAND:
@@ -54,15 +54,15 @@ void sendMessage(osMessageQId msgQ, msgType_t type, msgSource_t source, uint8_t 
     dataContentPtr = pvPortMalloc(dataLength);
 
     // Copy the data into the allocated memory block
-    memcpy(dataContentPtr, data, dataLength);
+    memcpy(dataContentPtr, pData, dataLength);
 
     // Pass the pointer to the generic message
-    messageTxPtr->data = dataContentPtr;
+    messageTxPtr->pData = dataContentPtr;
     messageTxPtr->mRsp = MRSP_HANDLE;
 
   } else {
     // Just pass the generic message the pointer, the library will not handle the memory
-    messageTxPtr->data = data;
+    messageTxPtr->pData = pData;
     messageTxPtr->mRsp = MRSP_NO_HANDLE;
   }
 
@@ -101,7 +101,7 @@ void sendCommand(osMessageQId msgQ, msgSource_t source, msgCommand_t command, ui
   commandStructTxPtr->command = command;
 
   // Pass the pointer to the generic message
-  messageTxPtr->data = commandStructTxPtr;
+  messageTxPtr->pData = commandStructTxPtr;
 
   // Polpulate the generic message
   messageTxPtr->mRsp = MRSP_HANDLE;
@@ -152,7 +152,7 @@ void fetchMessage(osMessageQId msgQ, msg_genericMessage_t *messagePtr, uint32_t 
 void *decodeMessage(msg_genericMessage_t *messagePtr, void *dataStruct) {
   // If the library is handling the data memory
   if (messagePtr->mRsp == MRSP_HANDLE) {
-    void *dataPtr = messagePtr->data;
+    void *dataPtr = messagePtr->pData;
 
     // Copy the data into the locally declared struct by pointer dataStruct
     memcpy(dataStruct, dataPtr, messagePtr->dataLength);
@@ -163,7 +163,7 @@ void *decodeMessage(msg_genericMessage_t *messagePtr, void *dataStruct) {
 
   } else {
     // Else, user is handling the memory, therefore just return the pointer to that data
-    return messagePtr->data;
+    return messagePtr->pData;
 
   }
 }
@@ -178,7 +178,7 @@ msgCommand_t decodeCommand(msg_genericMessage_t *messagePtr) {
   msgCommand_t commandRx;
 
   // Collect struct pointer from generic message, and collect command
-  commandStructRxPtr = messagePtr->data;
+  commandStructRxPtr = messagePtr->pData;
   commandRx = commandStructRxPtr->command;
 
   // Free data memory

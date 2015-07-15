@@ -2,6 +2,7 @@
   * ============================================================================
   * File Name          : USARTOutTask_task.c
   * Description        : USARTOutTask Body
+  * Author             : Sean Wood
   * ============================================================================
   */
 
@@ -22,7 +23,6 @@ void StartUSARTOutTask(void const * argument) {
 
     freeHeap = xPortGetFreeHeapSize();
     osDelay(100);
-  
   }
 
 }

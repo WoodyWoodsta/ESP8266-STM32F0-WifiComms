@@ -22,9 +22,43 @@ DMA_HandleTypeDef hdma_usart2_tx;
 
 // == Private Function Declarations ==
 static HAL_StatusTypeDef UART_EndTransmit_IT(UART_HandleTypeDef *huart);
+static int inHandlerMode(void);
+
+// == Private Function Definitions ==
+/**
+* @brief Determine whether we are in thread mode or handler mode
+* @note Not used any longer
+*/
+static int inHandlerMode(void) {
+  return __get_IPSR() != 0;
+}
+
+/**
+* @brief  Wraps up transmission in non blocking mode.
+* @param  huart: pointer to a UART_HandleTypeDef structure that contains
+*                the configuration information for the specified UART module.
+* @retval HAL status
+*/
+static HAL_StatusTypeDef UART_EndTransmit_IT(UART_HandleTypeDef *huart) {
+  /* Disable the UART Transmit Complete Interrupt */
+  __HAL_UART_DISABLE_IT(huart, UART_IT_TC);
+
+  /* Check if a receive process is ongoing or not */
+  if (huart->State == HAL_UART_STATE_BUSY_TX_RX) {
+    huart->State = HAL_UART_STATE_BUSY_RX;
+  } else {
+    /* Disable the UART Error Interrupt: (Frame error, noise error, overrun error) */
+    __HAL_UART_DISABLE_IT(huart, UART_IT_ERR);
+
+    huart->State = HAL_UART_STATE_READY;
+  }
+
+  HAL_UART_TxCpltCallback(huart);
+
+  return HAL_OK;
+}
 
 // == Function Definitions ==
-
 /**
 * @brief System clock configuration
 */
@@ -97,6 +131,7 @@ void MX_USART2_UART_Init(void) {
 
 /**
 * @brief DMA controller clock Initialisation
+* @note Not used any longer
 */
 void MX_DMA_Init(void) {
   /* DMA controller clock enable */
@@ -146,7 +181,6 @@ void MX_GPIO_Init(void) {
 }
 
 // == USART Receive via IT Custom Driver ==
-
 /**
 * @brief Receive data, in interrupt mode (non-blocking), up until a terminator
 * @param *huart: Pointer to UART handle
@@ -237,7 +271,7 @@ void cHAL_UART_IRQTermHandler(UART_HandleTypeDef *huart) {
 
   /* Call UART Error Call back function if need be --------------------------*/
   if (huart->ErrorCode != HAL_UART_ERROR_NONE) {
-    HAL_UART_ErrorCallback(huart); // TODO Implement this
+    HAL_UART_ErrorCallback(huart);
   }
 
 #if !defined(STM32F030x6) && !defined(STM32F030x8)&& !defined(STM32F070xB)&& !defined(STM32F070x6)&& !defined(STM32F030xC)
@@ -273,53 +307,54 @@ void cHAL_UART_IRQTermHandler(UART_HandleTypeDef *huart) {
 * @brief Receive data, in interrupt mode (non-blocking), up until a terminator (data transfer)
 *         Function called for every byte under interruption only, once
 *         interruptions have been enabled by HAL_UART_Receive_IT()
+*         Terminators included in the received buffer
 * @param  *huart: Pointer to UART handle
 * @retval HAL status
 */
 HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
   uint16_t uhMask = huart->Mask;
-  uint16_t RxXferSize = huart->RxXferSize; // Total allocated string buffer length (NOTE: This is not the memory allocated to the entire ringBuffer_entry)
-  uint16_t RxXferCount = huart->RxXferCount;
+  uint16_t rxXferSize = huart->RxXferSize; // Total allocated string buffer length
+  uint16_t rxXferCount = huart->RxXferCount;
 
+  // Check state of USART (NOTE: HAL_UART_STATE_READY implies there was an error, but this should not halt ransfer)
   if ((huart->State == HAL_UART_STATE_BUSY_TX_RX) || (huart->State == HAL_UART_STATE_BUSY_RX) || (huart->State == HAL_UART_STATE_READY)) {
 
+    // Grab the character from the receive data register
     uint8_t inChar = (uint8_t) (huart->Instance->RDR & (uint8_t) uhMask);
 
-
-    // If we have run out of buffer, "re-allocate" some more
-    if (RxXferCount == RxXferSize) {
+    // If we have run out of buffer, "re-allocate" some more (dynamic allocation-re-allocation)
+    if (rxXferCount == rxXferSize) {
       // Increment the current buffer size by 16 bytes
-      RxXferSize += USART_DYNAMIC_BUFFER_INCREMENT;
+      rxXferSize += USART_DYNAMIC_BUFFER_INCREMENT;
 
       // Create a new pointer and allocate the new memory required
-      uint8_t *newPtr = pvPortMalloc(RxXferSize);
+      uint8_t *pNew = pvPortMalloc(rxXferSize);
 
       // Copy in and free the existing buffer, only if this is not the first allocation of the string
       // NOTE: This is because the pointer to the previous string may still be used elsewhere
-      if (RxXferSize != USART_DYNAMIC_BUFFER_INCREMENT) {
-        memcpy(newPtr, huart->pRxBuffPtr, RxXferCount);
+      if (rxXferSize != USART_DYNAMIC_BUFFER_INCREMENT) {
+        memcpy(pNew, huart->pRxBuffPtr, rxXferCount);
         vPortFree(huart->pRxBuffPtr);
-
       }
 
       // Re-assign the handle's rx buffer pointer to the new pointer and update total string buffer length
-      huart->pRxBuffPtr = newPtr;
-      huart->RxXferSize = RxXferSize;
+      huart->pRxBuffPtr = pNew;
+      huart->RxXferSize = rxXferSize;
     }
 
-    huart->pRxBuffPtr[RxXferCount] = (uint8_t) inChar;
-    huart->RxXferCount = ++RxXferCount; // Update the receive count
+    huart->pRxBuffPtr[rxXferCount] = (uint8_t) inChar;
+    huart->RxXferCount = ++rxXferCount; // Update the receive count
     // At this stage, huart->RxXferCount reflects the number of bytes in the buffer
 
     // If we have reached a <cr>, <lf> or NULL, or if we have reached the end of the largest buffer, send off a completed string
-    if ((inChar == 0x0A) || (RxXferCount == huart->RxXferMaxSize)) {
+    if ((inChar == 0x0A) || (rxXferCount == huart->RxXferMaxSize)) {
 
       // If the string is more than just a <cr><lf>, fire the receive complete callback
-      if (!(RxXferCount <= 2)) {
+      if (rxXferCount > 2) {
         HAL_UART_RxCpltCallback(huart);
       } else {
         // Else we should free the existing buffer, if it exists!
-        if (RxXferCount != 0) {
+        if (rxXferCount != 0) {
           vPortFree(huart->pRxBuffPtr);
         }
       }
@@ -333,7 +368,6 @@ HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
     }
 
     return HAL_OK;
-
   } else {
     return HAL_BUSY;
 
@@ -342,7 +376,7 @@ HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
 
 /**
 * @brief Transmit data out of the UART via DMA safely (i.e. without stomping existing transmissions)
-* NOTE: This will not be called in an interupt due to the use of osDelay()
+* NOTE: This can still be called in interrupts due to the check
 * @param *huart: Pointer to UART handle
 * @param *pData: Pointer to the data to transmit
 * @param size: Size of the data to transmit
@@ -351,20 +385,48 @@ HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
 HAL_StatusTypeDef cHAL_USART_sTransmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t size) {
   HAL_StatusTypeDef txStatus = HAL_BUSY;
 
-  // Loop until HAL_UART_Transmit_DMA signals that the DMA accepted the tramission call
-  // Return with the error if the call returned errors
   while (1) {
     txStatus = HAL_UART_Transmit_DMA(huart, pData, size);
 
-    // Check for OK to prevent other checks, else check for errors
-    if (txStatus == HAL_OK) { 
-      return HAL_OK; 
-    } else if (txStatus == HAL_ERROR) { 
-      return HAL_ERROR; 
-    } else if (txStatus == HAL_TIMEOUT) {
-      return HAL_TIMEOUT; 
+    // If we are in thread mode, wait on HAL_BUSY, else just return the status
+    if (!inHandlerMode()) {
+      // Check for OK to prevent other checks, else check for errors
+      if (txStatus != HAL_BUSY) {
+        return txStatus;
+      }
+    } else {
+      return txStatus;
     }
-    osDelay(5); // Do not block other activities TODO Comfirm the need for this
+
+    osDelay(5);
+  }
+}
+
+/**
+* @brief Transmit data out of the UART via Interrupts safely (i.e. without stomping existing transmissions)
+* NOTE: This can still be called in interrupts due to the check
+* @param *huart: Pointer to UART handle
+* @param *pData: Pointer to the data to transmit
+* @param size: Size of the data to transmit
+* @retval HAL status
+*/
+HAL_StatusTypeDef cHAL_USART_sTransmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t size) {
+  HAL_StatusTypeDef txStatus = HAL_BUSY;
+
+  while (1) {
+    txStatus = HAL_UART_Transmit_IT(huart, pData, size);
+
+    // If we are in thread mode, wait on HAL_BUSY, else just return the status
+    if (!inHandlerMode()) {
+      // Check for OK to prevent other checks, else check for errors
+      if (txStatus != HAL_BUSY) {
+        return txStatus;
+      }
+    } else {
+      return txStatus;
+    }
+
+    osDelay(5);
   }
 }
 
@@ -374,24 +436,27 @@ HAL_StatusTypeDef cHAL_USART_sTransmit_DMA(UART_HandleTypeDef *huart, uint8_t *p
 * @param *huart: Pointer to UART handle
 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-  msg_stringMessage_t *txStringMessagePtr;
-  txStringMessagePtr = osPoolAlloc(strBufMPool);
+  msg_stringMessage_t *pTxStringMessage;
+  pTxStringMessage = osPoolAlloc(strBufMPool);
 
   // Fill the string message
-  txStringMessagePtr->stringPtr = huart->pRxBuffPtr;
-  txStringMessagePtr->stringLength = huart->RxXferCount;
+  pTxStringMessage->pString = huart->pRxBuffPtr;
+  pTxStringMessage->stringLength = huart->RxXferCount;
 
+  // Identify source
   if (huart->Instance == USART1_BASE) {
-    txStringMessagePtr->messageSource = MSG_SRC_USB;
+    pTxStringMessage->messageSource = MSG_SRC_USB;
   } else {
-    txStringMessagePtr->messageSource = MSG_SRC_WIFI;
+    pTxStringMessage->messageSource = MSG_SRC_WIFI;
   }
 
-  osStatus status = osMessagePut(msgQUSARTIn, (uint32_t) txStringMessagePtr, 0);
+  // Send the string message to the USARTInTask
+  osStatus status = osMessagePut(msgQUSARTIn, (uint32_t) pTxStringMessage, 0);
 
+  // If the send failed, free the relevant memory
   if (status != osOK) {
-    vPortFree(txStringMessagePtr->stringPtr);
-    osPoolFree(strBufMPool, txStringMessagePtr);
+    vPortFree(pTxStringMessage->pString);
+    osPoolFree(strBufMPool, pTxStringMessage);
   }
 }
 
@@ -401,51 +466,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 */
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
   // Free the memory held by the string during transmit
-  vPortFree((huart->pTxBuffPtr - huart->TxXferSize));
+  vPortFree(huart->pTxBuffPtr - huart->TxXferSize);
 }
-
 
 /**
-* @brief  Wraps up transmission in non blocking mode.
-* @param  huart: pointer to a UART_HandleTypeDef structure that contains
-*                the configuration information for the specified UART module.
-* @retval HAL status
+* @brief USART callback on TX or RX error
+* @param *huart: Pointer to UART handle
 */
-static HAL_StatusTypeDef UART_EndTransmit_IT(UART_HandleTypeDef *huart) {
-  /* Disable the UART Transmit Complete Interrupt */
-  __HAL_UART_DISABLE_IT(huart, UART_IT_TC);
-
-  /* Check if a receive process is ongoing or not */
-  if (huart->State == HAL_UART_STATE_BUSY_TX_RX) {
-    huart->State = HAL_UART_STATE_BUSY_RX;
-  } else {
-    /* Disable the UART Error Interrupt: (Frame error, noise error, overrun error) */
-    __HAL_UART_DISABLE_IT(huart, UART_IT_ERR);
-
-    huart->State = HAL_UART_STATE_READY;
-  }
-
-  HAL_UART_TxCpltCallback(huart);
-
-  return HAL_OK;
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, SET);
 }
-
-#if !defined(STM32F030x6) && !defined(STM32F030x8)&& !defined(STM32F070xB)&& !defined(STM32F070x6)&& !defined(STM32F030xC)
-/**
-* @brief Initializes the UART wake-up from stop mode parameters when triggered by address detection.
-* @param huart: uart handle
-* @param WakeUpSelection: UART wake up from stop mode parameters
-* @retval HAL status
-*/
-static void UART_Wakeup_AddressConfig(UART_HandleTypeDef *huart, UART_WakeUpTypeDef WakeUpSelection) {
-  /* Check parmeters */
-  assert_param(IS_UART_WAKEUP_INSTANCE(huart->Instance));
-  assert_param(IS_UART_ADDRESSLENGTH_DETECT(WakeUpSelection.AddressLength));
-
-  /* Set the USART address length */
-  MODIFY_REG(huart->Instance->CR2, USART_CR2_ADDM7, WakeUpSelection.AddressLength);
-
-  /* Set the USART address node */
-  MODIFY_REG(huart->Instance->CR2, USART_CR2_ADD, ((uint32_t) WakeUpSelection.Address << UART_CR2_ADDRESS_LSB_POS));
-}
-#endif /* !defined(STM32F030x6) && !defined(STM32F030x8)&& !defined(STM32F070xB)&& !defined(STM32F070x6)&& !defined(STM32F030xC) */

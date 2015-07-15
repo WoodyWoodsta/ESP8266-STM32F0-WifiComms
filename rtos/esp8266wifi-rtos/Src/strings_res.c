@@ -3,6 +3,7 @@
 * File Name          : strings_res.c
 * Description        : Source file for all strings used throughout the
 *                      project
+* Author             : Sean Wood
 * ============================================================================
 */
 

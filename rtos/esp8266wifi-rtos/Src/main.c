@@ -2,6 +2,8 @@
   * ============================================================================
   * File Name          : main.c
   * Description        : Main program body
+  * Author             : Sean Wood
+  *                      Adapted from STM32CubeMX FreeRTOS project generator
   * ============================================================================
   *
   * Modified by Team 13
@@ -49,7 +51,7 @@ osMessageQDef(msgQUSARTIn, STRING_BUFFER_MPOOL_SIZE, msg_stringMessage_t);
 // USART Out Task Message Queue
 osMessageQDef(msgQUSARTOut, 2, msg_genericMessage_t);
 
-// Boss Task Command Queue
+// Boss Task Message Queue
 osMessageQDef(msgQBoss, 5, msg_genericMessage_t);
 
 
@@ -103,7 +105,7 @@ int main(void) {
   // USART Out Task Queue
   msgQUSARTOut = osMessageCreate(osMessageQ(msgQUSARTOut), NULL);
 
-  // Boss Task Command Queue
+  // Boss Task Queue
   msgQBoss = osMessageCreate(osMessageQ(msgQBoss), NULL);
   
   /* USER CODE END RTOS_QUEUES */
@@ -115,6 +117,7 @@ int main(void) {
 
   /* Infinite loop */
   while (1) {
+    __asm("nop");
   }
 
 }

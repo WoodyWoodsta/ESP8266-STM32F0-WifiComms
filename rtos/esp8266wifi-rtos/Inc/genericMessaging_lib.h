@@ -52,14 +52,14 @@ typedef struct {
   msgSource_t messageSource; // Where did this message come from
   uint8_t mRsp; // Data memory responsibility
   uint32_t dataLength; // Length of the data
-  void *data; // Pointer to data TODO Rename this to dataPtr
+  void *pData; // Pointer to data TODO Rename this to dataPtr
 } msg_genericMessage_t;
 
 // String pointer message struct to be used for sending to the USART In Task
 typedef struct {
   msgSource_t messageSource; // Where did this message come from
   uint16_t stringLength; // Length of the string
-  uint8_t *stringPtr; // Pointer to string
+  uint8_t *pString; // Pointer to string
 } msg_stringMessage_t;
 
 // == Message Data Structures ==
@@ -69,7 +69,7 @@ typedef struct {
 typedef struct {
   msgType_t messageType;
   uint16_t stringLength;
-  char *stringPtr;
+  uint8_t *pString;
 } data_string_t;
 
 // Co-ordinate data struct
