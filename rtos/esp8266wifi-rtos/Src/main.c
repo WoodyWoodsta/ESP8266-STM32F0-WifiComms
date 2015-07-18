@@ -72,6 +72,10 @@ int main(void) {
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
 
+  // Initialise global flags
+  globalFlags.commState = COMM_STATE_MANUAL;
+  globalFlags.proceedures.wifiProceedure = WIFI_PROC_NONE;
+
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */

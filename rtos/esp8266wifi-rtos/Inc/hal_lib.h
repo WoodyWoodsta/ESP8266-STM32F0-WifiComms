@@ -31,8 +31,7 @@ void MX_DMA_Init(void);
 void MX_GPIO_Init(void);
 void cHAL_UART_IRQTermHandler(UART_HandleTypeDef *huart);
 HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart);
-HAL_StatusTypeDef cHAL_USART_sTransmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t size);
-HAL_StatusTypeDef cHAL_USART_sTransmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t size);
+HAL_StatusTypeDef cHAL_USART_sTransmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t size, uint8_t mSource);
 
 // == Exported Function Prototypes ==
 extern HAL_StatusTypeDef cHAL_UART_TermReceive_IT(UART_HandleTypeDef *huart, uint16_t MaxSize);

@@ -39,9 +39,12 @@ typedef enum {
   MSG_SRC_BOSS_TASK
 } msgSource_t;
 
-// Commands usable in messages
+// Commands
 typedef enum {
-  MSG_CMD_WIFI_SEND_AT,
+  MSG_CMD_NO_CMD,
+  MSG_CMD_WIFI_TX_AT,
+  MSG_CMD_WIFI_RX_OK,
+  MSG_CMD_WIFI_TEST_AT,
   MSG_CMD_WIFI_CONNECT_AP,
   MSG_COMMAND_LED0_TOGGLE
 } msgCommand_t;

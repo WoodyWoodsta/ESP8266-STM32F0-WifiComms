@@ -14,26 +14,43 @@
 #include "hal_lib.h"
 #include "genericMessaging_lib.h"
 #include "string.h"
-//#include "strings_res.h"
+#include "strings_res.h"
 #include "stdio.h"
 
 // == Definitions ==
 #define AP_DETAILS "AWNetHome","awnethome92"
 
 // == Type Declarations - General ==
-// Method of communication with the wifi module. INTERPRET allows tasks to handle
-// responses from the module. DIRECT routes all communication via USB<-->WIFI
+// Method of communication with the wifi module. AUTO allows tasks to handle
+// responses from the module. MANUAL routes all communication via USB<-->WIFI
 typedef enum {
   COMM_STATE_AUTO,
   COMM_STATE_MANUAL
 } commState_t;
+
+// Wifi communication proceedures
+typedef enum {
+  WIFI_PROC_NONE,
+  WIFI_PROC_AT_TEST,
+  WIFI_PROC_INIT,
+  WIFI_PROC_CONNECT_AP
+} wifiProceedure_t;
+
+typedef struct {
+  wifiProceedure_t wifiProceedure;
+} globalProceedures_t;
+
+typedef struct {
+  commState_t commState;
+  globalProceedures_t proceedures;
+} globalFlags_t;
 
 // == Exported Variables ==
 extern osThreadId bossTaskHandle;
 extern osThreadId USARTInTaskHandle;
 extern osThreadId USARTInBufferTaskHandle;
 extern osThreadId USARTOutTaskHandle;
-extern commState_t wifiCommState;
+extern globalFlags_t globalFlags;
 
 // USART In Task String Queue
 extern osMessageQId msgQUSARTIn;

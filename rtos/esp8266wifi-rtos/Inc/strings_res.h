@@ -10,12 +10,15 @@
 #include "stm32f0xx_hal.h" // For data types
 
 // == Exported Variables ==
-extern const uint8_t sendATTxString[];
-extern const uint8_t commStateManualTxString[];
-extern const uint8_t commStateAutoTxString[];
-extern const uint8_t led0ToggleRxString[];
-extern const uint8_t commStateManualRxString[];
-extern const uint8_t commStateAutoRxString[];
-extern const uint8_t testATRxString[];
+extern const uint8_t txString_ATCommandTest[];
+extern const uint8_t txString_OKReceived[];
+extern const uint8_t txString_commStateManual[];
+extern const uint8_t txString_commStateAuto[];
+
+extern const uint8_t rxString_led0Toggle[];
+extern const uint8_t rxString_commStateManual[];
+extern const uint8_t rxString_commStateAuto[];
+extern const uint8_t rxString_ATCommandTest[];
+extern const uint8_t rxString_OK[];
 
 

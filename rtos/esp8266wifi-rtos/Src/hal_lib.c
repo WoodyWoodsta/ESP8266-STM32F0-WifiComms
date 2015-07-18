@@ -23,6 +23,7 @@ DMA_HandleTypeDef hdma_usart2_tx;
 // == Private Function Declarations ==
 static HAL_StatusTypeDef UART_EndTransmit_IT(UART_HandleTypeDef *huart);
 static int inHandlerMode(void);
+HAL_StatusTypeDef cHAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint8_t mSource);
 
 // == Private Function Definitions ==
 /**
@@ -56,6 +57,51 @@ static HAL_StatusTypeDef UART_EndTransmit_IT(UART_HandleTypeDef *huart) {
   HAL_UART_TxCpltCallback(huart);
 
   return HAL_OK;
+}
+
+/**
+* @brief Send an amount of data in interrupt mode, and specify the source of the string
+* @param huart: uart handle
+* @param pData: pointer to data buffer
+* @param Size: amount of data to be sent
+* @param mSource: Whether the string was previously malloc'ed and so should be freed upon tx complete or not
+* @retval HAL status
+*/
+HAL_StatusTypeDef cHAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint8_t mSource) {
+  if ((huart->State == HAL_UART_STATE_READY) || (huart->State == HAL_UART_STATE_BUSY_RX)) {
+    if ((pData == NULL) || (Size == 0)) {
+      return HAL_ERROR;
+    }
+
+    /* Process Locked */
+    __HAL_LOCK(huart);
+
+    huart->pTxBuffPtr = pData;
+    huart->TxXferSize = Size;
+    huart->TxXferCount = Size;
+    huart->mSource = mSource;
+
+    huart->ErrorCode = HAL_UART_ERROR_NONE;
+    /* Check if a receive process is ongoing or not */
+    if (huart->State == HAL_UART_STATE_BUSY_RX) {
+      huart->State = HAL_UART_STATE_BUSY_TX_RX;
+    } else {
+      huart->State = HAL_UART_STATE_BUSY_TX;
+    }
+
+    /* Enable the UART Error Interrupt: (Frame error, noise error, overrun error) */
+    __HAL_UART_ENABLE_IT(huart, UART_IT_ERR);
+
+    /* Process Unlocked */
+    __HAL_UNLOCK(huart);
+
+    /* Enable the UART Transmit Data Register Empty Interrupt */
+    __HAL_UART_ENABLE_IT(huart, UART_IT_TXE);
+
+    return HAL_OK;
+  } else {
+    return HAL_BUSY;
+  }
 }
 
 // == Function Definitions ==
@@ -375,34 +421,6 @@ HAL_StatusTypeDef cUART_TermReceive_IT(UART_HandleTypeDef *huart) {
 }
 
 /**
-* @brief Transmit data out of the UART via DMA safely (i.e. without stomping existing transmissions)
-* NOTE: This can still be called in interrupts due to the check
-* @param *huart: Pointer to UART handle
-* @param *pData: Pointer to the data to transmit
-* @param size: Size of the data to transmit
-* @retval HAL status
-*/
-HAL_StatusTypeDef cHAL_USART_sTransmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t size) {
-  HAL_StatusTypeDef txStatus = HAL_BUSY;
-
-  while (1) {
-    txStatus = HAL_UART_Transmit_DMA(huart, pData, size);
-
-    // If we are in thread mode, wait on HAL_BUSY, else just return the status
-    if (!inHandlerMode()) {
-      // Check for OK to prevent other checks, else check for errors
-      if (txStatus != HAL_BUSY) {
-        return txStatus;
-      }
-    } else {
-      return txStatus;
-    }
-
-    osDelay(5);
-  }
-}
-
-/**
 * @brief Transmit data out of the UART via Interrupts safely (i.e. without stomping existing transmissions)
 * NOTE: This can still be called in interrupts due to the check
 * @param *huart: Pointer to UART handle
@@ -410,11 +428,11 @@ HAL_StatusTypeDef cHAL_USART_sTransmit_DMA(UART_HandleTypeDef *huart, uint8_t *p
 * @param size: Size of the data to transmit
 * @retval HAL status
 */
-HAL_StatusTypeDef cHAL_USART_sTransmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t size) {
+HAL_StatusTypeDef cHAL_USART_sTransmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t size, uint8_t mSource) {
   HAL_StatusTypeDef txStatus = HAL_BUSY;
 
   while (1) {
-    txStatus = HAL_UART_Transmit_IT(huart, pData, size);
+    txStatus = cHAL_UART_Transmit_IT(huart, pData, size, mSource);
 
     // If we are in thread mode, wait on HAL_BUSY, else just return the status
     if (!inHandlerMode()) {
@@ -465,8 +483,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 * @param *huart: Pointer to UART handle
 */
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
-  // Free the memory held by the string during transmit
-  vPortFree(huart->pTxBuffPtr - huart->TxXferSize);
+  // If the string is marked to be freed
+  if (huart->mSource) {
+    // Free the memory held by the string during transmit
+    vPortFree(huart->pTxBuffPtr - huart->TxXferSize);
+  }
 }
 
 /**

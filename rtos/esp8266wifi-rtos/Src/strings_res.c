@@ -13,13 +13,15 @@
 // == Exported Variables ==
 
 // Strings to send
-const uint8_t ATCommandTestTxString[] = "AT\r\n";
-const uint8_t commStateManualTxString[] = "MANUAL Mode Started\r\n";
-const uint8_t commStateAutoTxString[] = "AUTO Mode Started\r\n";
+const uint8_t txString_ATCommandTest[] = "AT\r\n";
+const uint8_t txString_OKReceived[] = "OK Received!\r\n";
+const uint8_t txString_commStateManual[] = "MANUAL On\r\n";
+const uint8_t txString_commStateAuto[] = "AUTO On\r\n";
 
 // Strings to compare with
-const uint8_t led0ToggleRxString[] = "Toggle LED0";
-const uint8_t commStateManualRxString[] = "MANUAL";
-const uint8_t commStateAutoRxString[] = "AUTO";
-const uint8_t testATRxString[] = "Test AT";
+const uint8_t rxString_led0Toggle[] = "Toggle LED0\r\n";
+const uint8_t rxString_commStateManual[] = "MANUAL\r\n";
+const uint8_t rxString_commStateAuto[] = "AUTO\r\n";
+const uint8_t rxString_ATCommandTest[] = "Test AT\r\n";
+const uint8_t rxString_OK[] = "OK\r\n";
 

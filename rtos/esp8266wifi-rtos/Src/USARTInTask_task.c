@@ -10,9 +10,9 @@
 #include "userTasks_task.h"
 
 // == Private Function Declarations ==
-void interpretUSBString(msg_stringMessage_t *pStringMessageIn);
-void interpretWifiString(msg_stringMessage_t *pStringMessageIn);
-void fetchString(msg_stringMessage_t *pMessage);
+static void interpretUSBString(msg_stringMessage_t *pStringMessageIn);
+static void interpretWifiString(msg_stringMessage_t *pStringMessageIn);
+static void fetchString(msg_stringMessage_t *pMessage);
 
 // == Function Definitions ==
 /**
@@ -41,15 +41,29 @@ void StartUSARTInTask(void const * argument) {
 * @brief Interpret a string received from the USB USART peripheral
 * @param *pStringMessageIn: Pointer to a generic message struct to interpret
 */
-void interpretUSBString(msg_stringMessage_t *pStringMessageIn) {
+static void interpretUSBString(msg_stringMessage_t *pStringMessageIn) {
   // If we are in manual mode, direct string to the Wifi module
-  if (wifiCommState == COMM_STATE_MANUAL) {
-    HAL_StatusTypeDef status = cHAL_USART_sTransmit_IT(&huart2, pStringMessageIn->pString, pStringMessageIn->stringLength);
+  if (globalFlags.commState == COMM_STATE_MANUAL) {
+    if (strncmp(rxString_commStateAuto, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
+      globalFlags.commState = COMM_STATE_AUTO;
+      cHAL_USART_sTransmit_IT(&huart1, txString_commStateAuto, strlen(txString_commStateAuto), 0);
+    } else {
+      HAL_StatusTypeDef status = cHAL_USART_sTransmit_IT(&huart2, pStringMessageIn->pString, pStringMessageIn->stringLength, 1);
 
-    // If we run into issues, get rid of the string
-    if (status != osOK) {
-      vPortFree(pStringMessageIn->pString);
+      // If we run into issues, get rid of the string
+      if (status != osOK) {
+        vPortFree(pStringMessageIn->pString);
+      }
     }
+  } else if (globalFlags.commState == COMM_STATE_AUTO) {
+    if (strncmp(rxString_commStateManual, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
+      globalFlags.commState = COMM_STATE_MANUAL;
+      cHAL_USART_sTransmit_IT(&huart1, txString_commStateManual, strlen(txString_commStateManual), 0);
+    } else if (strncmp(rxString_ATCommandTest, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
+      sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_TEST_AT, osWaitForever);
+    }
+
+    vPortFree(pStringMessageIn->pString);
   }
 }
 
@@ -57,15 +71,21 @@ void interpretUSBString(msg_stringMessage_t *pStringMessageIn) {
 * @brief Interpret a string received from the Wifi module
 * @param *pStringMessageIn: Pointer to a generic message struct to interpret
 */
-void interpretWifiString(msg_stringMessage_t *pStringMessageIn) {
+static void interpretWifiString(msg_stringMessage_t *pStringMessageIn) {
   // If we are in manual mode, direct string to the USB module
-  if (wifiCommState == COMM_STATE_MANUAL) {
-    HAL_StatusTypeDef status = cHAL_USART_sTransmit_IT(&huart1, pStringMessageIn->pString, pStringMessageIn->stringLength);
+  if (globalFlags.commState == COMM_STATE_MANUAL) {
+    HAL_StatusTypeDef status = cHAL_USART_sTransmit_IT(&huart1, pStringMessageIn->pString, pStringMessageIn->stringLength, 1);
 
     // If we run into issues, get rid of the string
     if (status != osOK) {
       vPortFree(pStringMessageIn->pString);
     }
+  } else if (globalFlags.commState == COMM_STATE_AUTO) {
+    if (strncmp(rxString_OK, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
+      sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_RX_OK, osWaitForever);
+    }
+    
+    vPortFree(pStringMessageIn->pString);
   }
 }
 
@@ -73,7 +93,7 @@ void interpretWifiString(msg_stringMessage_t *pStringMessageIn) {
 * @brief Fetch a string message from the USARTIn Queue
 * @param *messagePtr: Pointer to a generic message struct copy into
 */
-void fetchString(msg_stringMessage_t *pMessage) {
+static void fetchString(msg_stringMessage_t *pMessage) {
   osEvent messageEvent;
   msg_stringMessage_t *pRxMessage;
 
