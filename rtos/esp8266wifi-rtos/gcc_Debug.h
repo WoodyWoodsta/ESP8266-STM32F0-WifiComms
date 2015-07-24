@@ -170,6 +170,9 @@
 #ifndef __DEC32_EPSILON__
 #define __DEC32_EPSILON__ 1E-6DF
 #endif
+#ifndef __OPTIMIZE__
+#define __OPTIMIZE__ 1
+#endif
 #ifndef __CHAR_UNSIGNED__
 #define __CHAR_UNSIGNED__ 1
 #endif
@@ -485,9 +488,6 @@
 #endif
 #ifndef __UHA_FBIT__
 #define __UHA_FBIT__ 8
-#endif
-#ifndef __NO_INLINE__
-#define __NO_INLINE__ 1
 #endif
 #ifndef __SFRACT_MIN__
 #define __SFRACT_MIN__ (-0.5HR-0.5HR)
@@ -902,6 +902,9 @@
 #endif
 #ifndef __INT8_MAX__
 #define __INT8_MAX__ 127
+#endif
+#ifndef __OPTIMIZE_SIZE__
+#define __OPTIMIZE_SIZE__ 1
 #endif
 #ifndef __UINT_FAST32_TYPE__
 #define __UINT_FAST32_TYPE__ unsigned int

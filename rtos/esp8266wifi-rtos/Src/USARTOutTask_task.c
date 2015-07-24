@@ -46,6 +46,16 @@ static void interpretCommand(msgCommand_t rxCommand) {
   switch (rxCommand) {
   case MSG_CMD_WIFI_TX_AT:
     cHAL_USART_sTransmit_IT(&huart2, txString_ATCommandTest, strlen(txString_ATCommandTest), 0);
+    break;
+  case MSG_CMD_WIFI_TX_ATE_0:
+    cHAL_USART_sTransmit_IT(&huart2, txString_ATE0, strlen(txString_ATE0), 0);
+    break;
+  case MSG_CMD_WIFI_TX_CIPMUX_1:
+    cHAL_USART_sTransmit_IT(&huart2, txString_multiConnect1, strlen(txString_multiConnect1), 0);
+    break;
+  case MSG_CMD_WIFI_TX_CWMODE_3:
+    cHAL_USART_sTransmit_IT(&huart2, txString_stationMode3, strlen(txString_stationMode3), 0);
+    break;
   default:
     break;
   }

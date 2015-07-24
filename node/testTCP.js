@@ -1,13 +1,13 @@
-/*  
-  Very simple TCP client to test host/server capabilities 
+/*
+  Very simple TCP client to test host/server capabilities
   of the ESP8266 wifi module.
 */
 
 var net = require('net'); // Load up the required library for TCP stuff
 
-// Create a new TCP socket 
-var client = new net.Socket(); 
-client.connect(1337, '192.168.1.189', function() { // Connect to the chip
+// Create a new TCP socket
+var client = new net.Socket();
+client.connect(3000, '192.168.137.132', function() { // Connect to the chip
   console.log('Connected');
   client.write('Hello, server! Love, Client. This is a really long stringHello, server! Love, Client. This is a really long stringHello, server! Love, Client. This is a really long stringHello, server! Love, Client. This is a really long stringHello, server! Love, Client. This is a really long string'); // Send some text
   // client.write('This is really really cool!\r\n') // Send some more text
@@ -17,7 +17,7 @@ client.connect(1337, '192.168.1.189', function() { // Connect to the chip
   // client.write('LEDs OFF\r\n');
   // console.log('LEDs Off command sent');
 });
- 
+
 // When data is recieved, call "data()"
 client.on('data', data);
 

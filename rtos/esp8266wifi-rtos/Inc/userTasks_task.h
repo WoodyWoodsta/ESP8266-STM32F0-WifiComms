@@ -28,16 +28,15 @@ typedef enum {
   COMM_STATE_MANUAL
 } commState_t;
 
-// Wifi communication proceedures
+// Wifi communication proceedures (flags)
 typedef enum {
-  WIFI_PROC_NONE,
-  WIFI_PROC_AT_TEST,
-  WIFI_PROC_INIT,
-  WIFI_PROC_CONNECT_AP
-} wifiProceedure_t;
+  WIFI_PROC_AT_TEST = 0b00000001,
+  WIFI_PROC_INIT = 0b00000010,
+  WIFI_PROC_CONNECT_AP = 0b00000100
+} wifiProceedures_t;
 
 typedef struct {
-  wifiProceedure_t wifiProceedure;
+  uint8_t wifiProceedures; // Support for up to 8 proceedures
 } globalProceedures_t;
 
 typedef struct {

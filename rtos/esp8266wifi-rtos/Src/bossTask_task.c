@@ -12,6 +12,7 @@
 // == Private Function Declarations ==
 static void interpretCommand(msgCommand_t rxCommand);
 static void proc_wifiATTest(msgCommand_t rxCommand);
+static void proc_wifiInit(msgCommand_t rxCommand);
 
 // == Function Definitions ==
 /**
@@ -45,41 +46,118 @@ void StartBossTask(void const * argument) {
 */
 static void interpretCommand(msgCommand_t rxCommand) {
   // Check first for known commands specific to the task
+  // NOTE: If one of these are fired, nothing else should be executed, so return
   switch (rxCommand) {
   case MSG_CMD_WIFI_TEST_AT:
     proc_wifiATTest(rxCommand);
+    return;
+  case MSG_CMD_WIFI_INIT:
+    proc_wifiInit(rxCommand);
+    return;
   default:
     break;
   }
 
   // Then check for commands specific to the proceedures in progress
-  switch (globalFlags.proceedures.wifiProceedure) {
-  case WIFI_PROC_AT_TEST:
+  uint8_t wifiProceedures = globalFlags.proceedures.wifiProceedures;
+  if (wifiProceedures & WIFI_PROC_AT_TEST) {
     proc_wifiATTest(rxCommand);
-    break;
-  default:
-
-    break;
+  }
+  
+  if (wifiProceedures & WIFI_PROC_INIT) {
+    proc_wifiInit(rxCommand);
   }
 }
 
 // == Proceedure Definitions ==
+// NOTE: Proceedures are re-entered upon receiveing a command, or being called specifically
 void proc_wifiATTest(msgCommand_t rxCommand) {
   static uint8_t step = 0;
   static msgCommand_t waitingCmd = MSG_CMD_NO_CMD;
 
+  // If we are not waiting on a CMD, but the proceedure function was called, we need to run through anyway
+  // We also need to run through if the command is the one we are waiting for
   if ((waitingCmd == MSG_CMD_NO_CMD) || (rxCommand == waitingCmd)) {
     switch (step) {
     case 0:
-      globalFlags.proceedures.wifiProceedure = WIFI_PROC_AT_TEST;
+      // Setup the proceedure
+      globalFlags.proceedures.wifiProceedures |= WIFI_PROC_AT_TEST;
+
+      // Step 0 body
       sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_AT, osWaitForever);
+
+      // Setup re-entry details
       waitingCmd = MSG_CMD_WIFI_RX_OK;
       step = 1;
       break;
     case 1:
+      // Step 1 body
       cHAL_USART_sTransmit_IT(&huart1, txString_OKReceived, strlen(txString_OKReceived), 0);
+
+      // Exit the proceedure
       step = 0;
-      globalFlags.proceedures.wifiProceedure = WIFI_PROC_NONE;
+      globalFlags.proceedures.wifiProceedures &= ~WIFI_PROC_AT_TEST;
+      waitingCmd = MSG_CMD_NO_CMD;
+    default:
+      break;
+    }
+  }
+}
+
+void proc_wifiInit(msgCommand_t rxCommand) {
+  static uint8_t step = 0;
+  static msgCommand_t waitingCmd = MSG_CMD_NO_CMD;
+
+  // If we are not waiting on a CMD, but the proceedure function was called, we need to run through anyway
+  // We also need to run through if the command is the one we are waiting for
+  if ((waitingCmd == MSG_CMD_NO_CMD) || (rxCommand == waitingCmd)) {
+    switch (step) {
+    case 0:
+      // Setup the proceedure
+      globalFlags.proceedures.wifiProceedures |= WIFI_PROC_INIT;
+
+      // Step 0 body - Check AT command set
+      sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_AT, osWaitForever);
+
+      // Setup re-entry details
+      waitingCmd = MSG_CMD_WIFI_RX_OK;
+      step = 1;
+      break;
+    case 1:
+      // Step 1 body - Turn off byte echo
+      sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_ATE_0, osWaitForever);
+
+      // Setup re-entry details
+      waitingCmd = MSG_CMD_WIFI_RX_OK;
+      step = 2;
+      break;
+
+    case 2:
+      // Step 2 body - Put module into dual mode
+      sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_CWMODE_3, osWaitForever);
+
+      // Setup re-entry details
+      waitingCmd = MSG_CMD_NO_CMD;
+      step = 3;
+      break;
+
+    case 3:
+      if (rxCommand == MSG_CMD_NO_CMD || rxCommand == MSG_CMD_WIFI_RX_NO_CHANGE) {
+        sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_CIPMUX_1, osWaitForever);
+
+        // Setup re-entry details
+        step = 4;
+        waitingCmd = MSG_CMD_WIFI_RX_OK;
+      }
+
+      break;
+
+    case 4:
+      // Exit the proceedure
+      cHAL_USART_sTransmit_IT(&huart1, txString_wifiInitialised, strlen(txString_wifiInitialised), 0);
+
+      step = 0;
+      globalFlags.proceedures.wifiProceedures &= ~WIFI_PROC_INIT;
       waitingCmd = MSG_CMD_NO_CMD;
     default:
       break;

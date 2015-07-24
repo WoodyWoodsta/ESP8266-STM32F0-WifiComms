@@ -61,6 +61,8 @@ static void interpretUSBString(msg_stringMessage_t *pStringMessageIn) {
       cHAL_USART_sTransmit_IT(&huart1, txString_commStateManual, strlen(txString_commStateManual), 0);
     } else if (strncmp(rxString_ATCommandTest, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
       sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_TEST_AT, osWaitForever);
+    } else if (strncmp(rxString_wifiInit, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
+      sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_INIT, osWaitForever);
     }
 
     vPortFree(pStringMessageIn->pString);
@@ -83,8 +85,12 @@ static void interpretWifiString(msg_stringMessage_t *pStringMessageIn) {
   } else if (globalFlags.commState == COMM_STATE_AUTO) {
     if (strncmp(rxString_OK, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
       sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_RX_OK, osWaitForever);
+
+    } else if (strncmp(rxString_noChange, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
+      sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_RX_NO_CHANGE, osWaitForever);
+
     }
-    
+
     vPortFree(pStringMessageIn->pString);
   }
 }
