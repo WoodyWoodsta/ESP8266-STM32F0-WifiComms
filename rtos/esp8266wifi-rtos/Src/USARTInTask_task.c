@@ -43,9 +43,9 @@ void StartUSARTInTask(void const * argument) {
 */
 static void interpretUSBString(msg_stringMessage_t *pStringMessageIn) {
   // If we are in manual mode, direct string to the Wifi module
-  if (globalFlags.commState == COMM_STATE_MANUAL) {
+  if (globalFlags.states.commState == COMM_STATE_MANUAL) {
     if (strncmp(rxString_commStateAuto, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
-      globalFlags.commState = COMM_STATE_AUTO;
+      globalFlags.states.commState = COMM_STATE_AUTO;
       cHAL_USART_sTransmit_IT(&huart1, txString_commStateAuto, strlen(txString_commStateAuto), 0);
     } else {
       HAL_StatusTypeDef status = cHAL_USART_sTransmit_IT(&huart2, pStringMessageIn->pString, pStringMessageIn->stringLength, 1);
@@ -55,14 +55,16 @@ static void interpretUSBString(msg_stringMessage_t *pStringMessageIn) {
         vPortFree(pStringMessageIn->pString);
       }
     }
-  } else if (globalFlags.commState == COMM_STATE_AUTO) {
+  } else if (globalFlags.states.commState == COMM_STATE_AUTO) {
     if (strncmp(rxString_commStateManual, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
-      globalFlags.commState = COMM_STATE_MANUAL;
+      globalFlags.states.commState = COMM_STATE_MANUAL;
       cHAL_USART_sTransmit_IT(&huart1, txString_commStateManual, strlen(txString_commStateManual), 0);
     } else if (strncmp(rxString_ATCommandTest, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
       sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_TEST_AT, osWaitForever);
     } else if (strncmp(rxString_wifiInit, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
       sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_INIT, osWaitForever);
+    } else if (strncmp(rxString_wifiConnectAp, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
+      sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_CONNECT_AP, osWaitForever);
     }
 
     vPortFree(pStringMessageIn->pString);
@@ -75,20 +77,28 @@ static void interpretUSBString(msg_stringMessage_t *pStringMessageIn) {
 */
 static void interpretWifiString(msg_stringMessage_t *pStringMessageIn) {
   // If we are in manual mode, direct string to the USB module
-  if (globalFlags.commState == COMM_STATE_MANUAL) {
+  if (globalFlags.states.commState == COMM_STATE_MANUAL) {
     HAL_StatusTypeDef status = cHAL_USART_sTransmit_IT(&huart1, pStringMessageIn->pString, pStringMessageIn->stringLength, 1);
 
     // If we run into issues, get rid of the string
     if (status != osOK) {
       vPortFree(pStringMessageIn->pString);
     }
-  } else if (globalFlags.commState == COMM_STATE_AUTO) {
+  } else if (globalFlags.states.commState == COMM_STATE_AUTO) {
     if (strncmp(rxString_OK, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
       sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_RX_OK, osWaitForever);
 
     } else if (strncmp(rxString_noChange, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
       sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_RX_NO_CHANGE, osWaitForever);
 
+    } else if (strncmp(rxString_error, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
+      sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_RX_ERROR, osWaitForever);
+
+    } else if (strncmp(rxString_noSuchFunction, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
+      sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_RX_NO_FUNCTION, osWaitForever);
+
+    } else if (strncmp(rxString_fail, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
+      sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_RX_FAIL, osWaitForever);
     }
 
     vPortFree(pStringMessageIn->pString);

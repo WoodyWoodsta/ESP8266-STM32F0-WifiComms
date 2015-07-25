@@ -18,9 +18,17 @@
 #include "stdio.h"
 
 // == Definitions ==
-#define AP_DETAILS "AWNetHome","awnethome92"
+#define AP_SSID   "coreNet"
+#define AP_KEY    "electronics9663"
 
 // == Type Declarations - General ==
+// Procedure statuses
+typedef enum {
+  PROC_STATUS_OK,
+  PROC_STATUS_BUSY,
+  PROC_STATUS_ERROR
+} procStatus_t;
+
 // Method of communication with the wifi module. AUTO allows tasks to handle
 // responses from the module. MANUAL routes all communication via USB<-->WIFI
 typedef enum {
@@ -28,20 +36,36 @@ typedef enum {
   COMM_STATE_MANUAL
 } commState_t;
 
-// Wifi communication proceedures (flags)
+// Peripheral states - to be used for locking out peripherals during procedures etc.
 typedef enum {
-  WIFI_PROC_AT_TEST = 0b00000001,
-  WIFI_PROC_INIT = 0b00000010,
-  WIFI_PROC_CONNECT_AP = 0b00000100
-} wifiProceedures_t;
+  GEN_STATE_READY,
+  GEN_STATE_BUSY,
+  GEN_STATE_ERROR
+} genericStates_t;
 
+// Wifi communication procedures (flags)
+typedef enum {
+  WIFI_PROC_NONE,
+  WIFI_PROC_AT_TEST,
+  WIFI_PROC_INIT,
+  WIFI_PROC_CONNECT_AP
+} wifiProcedures_t;
+
+// Proceedure flags
 typedef struct {
-  uint8_t wifiProceedures; // Support for up to 8 proceedures
-} globalProceedures_t;
+  wifiProcedures_t wifiProcedures;
+} globalProcedures_t;
 
+// Custom peripheral states
 typedef struct {
   commState_t commState;
-  globalProceedures_t proceedures;
+  genericStates_t wifiState; // Task level peripheral state flag (for task level locking)
+} globalStates_t;
+
+// Global program flags
+typedef struct {
+  globalStates_t states;
+  globalProcedures_t procedures;
 } globalFlags_t;
 
 // == Exported Variables ==

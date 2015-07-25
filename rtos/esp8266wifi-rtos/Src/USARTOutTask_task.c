@@ -56,6 +56,20 @@ static void interpretCommand(msgCommand_t rxCommand) {
   case MSG_CMD_WIFI_TX_CWMODE_3:
     cHAL_USART_sTransmit_IT(&huart2, txString_stationMode3, strlen(txString_stationMode3), 0);
     break;
+  case MSG_CMD_WIFI_TX_CONNECT_AP: {
+    // Formulate the connect command
+    uint8_t apSSID[] = "coreNet";
+    uint8_t apKey[] = "electronics9663";
+    uint8_t *txApCommand = pvPortMalloc(strlen(apSSID) + strlen(apKey) + strlen(txString_connectAPCommand) + 7);
+    sprintf(txApCommand, "%s\"%s\",\"%s\"\r\n", txString_connectAPCommand, apSSID, apKey);
+
+    HAL_StatusTypeDef status = cHAL_USART_sTransmit_IT(&huart2, txApCommand, strlen(txApCommand), 1);
+    if (status != HAL_OK) {
+      vPortFree(txApCommand);
+    }
+
+    break;
+  }
   default:
     break;
   }
