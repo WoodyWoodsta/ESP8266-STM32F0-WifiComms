@@ -1,12 +1,12 @@
 /**
-  * ============================================================================
-  * File Name          : bossTask_task.c
-  * Description        : Boss Task Body
-  * Author             : Sean Wood
-  * ============================================================================
-  */
+ * ============================================================================
+ * File Name          : bossTask_task.c
+ * Description        : Boss Task Body
+ * Author             : Sean Wood
+ * ============================================================================
+ */
 
-  // == Includes ==
+// == Includes ==
 #include "userTasks_task.h"
 
 // == Private Function Declarations ==
@@ -16,9 +16,9 @@ static procStatus_t proc_wifiInit(msgCommand_t rxCommand);
 static procStatus_t proc_wifiConnectAP(msgCommand_t rxCommand);
 // == Function Definitions ==
 /**
-* @brief bossTask
-* @param argument
-*/
+ * @brief bossTask
+ * @param argument
+ */
 void StartBossTask(void const * argument) {
   // Start receiving data via USB UART
   cHAL_UART_TermReceive_IT(&huart1, 512);
@@ -41,9 +41,9 @@ void StartBossTask(void const * argument) {
 }
 
 /**
-* @brief Interpret the command received, and act on it
-* @param rxCommand: Command received in the message
-*/
+ * @brief Interpret the command received, and act on it
+ * @param rxCommand: Command received in the message
+ */
 static void interpretCommand(msgCommand_t rxCommand) {
   // Check first for known commands specific to the task
   // NOTE: If one of these are fired, nothing else should be executed, so return
@@ -55,9 +55,12 @@ static void interpretCommand(msgCommand_t rxCommand) {
 
       // Handle the error
       if (status == PROC_STATUS_ERROR) {
-        cHAL_USART_sTransmit_IT(&huart1, txString_ATCommandTestError, strlen(txString_ATCommandTestError), 0);
+        cHAL_USART_sTransmit_IT(&huart1, txString_ATCommandTestError,
+            strlen(txString_ATCommandTestError), 0);
         return;
-      } else if (status == PROC_STATUS_BUSY) { osDelay(100); } // If the peripheral is busy, wait for a bit
+      } else if (status == PROC_STATUS_BUSY) {
+        osDelay(100);
+      } // If the peripheral is busy, wait for a bit
     } while (status != PROC_STATUS_OK);
     return;
   }
@@ -68,9 +71,12 @@ static void interpretCommand(msgCommand_t rxCommand) {
 
       // Handle the error
       if (status == PROC_STATUS_ERROR) {
-        cHAL_USART_sTransmit_IT(&huart1, txString_wifiInitError, strlen(txString_wifiInitError), 0);
+        cHAL_USART_sTransmit_IT(&huart1, txString_wifiInitError,
+            strlen(txString_wifiInitError), 0);
         return;
-      } else if (status == PROC_STATUS_BUSY) { osDelay(100); } // If the peripheral is busy, wait for a bit
+      } else if (status == PROC_STATUS_BUSY) {
+        osDelay(100);
+      } // If the peripheral is busy, wait for a bit
     } while (status != PROC_STATUS_OK);
     return;
   }
@@ -81,9 +87,12 @@ static void interpretCommand(msgCommand_t rxCommand) {
 
       // Handle the error
       if (status == PROC_STATUS_ERROR) {
-        cHAL_USART_sTransmit_IT(&huart1, txString_wifiInitError, strlen(txString_wifiInitError), 0);
+        cHAL_USART_sTransmit_IT(&huart1, txString_wifiInitError,
+            strlen(txString_wifiInitError), 0);
         return;
-      } else if (status == PROC_STATUS_BUSY) { osDelay(100); } // If the peripheral is busy, wait for a bit
+      } else if (status == PROC_STATUS_BUSY) {
+        osDelay(100);
+      } // If the peripheral is busy, wait for a bit
     } while (status != PROC_STATUS_OK);
     return;
   }
@@ -118,13 +127,18 @@ procStatus_t proc_wifiATTest(msgCommand_t rxCommand) {
   case 0:
     if (globalFlags.states.wifiState == GEN_STATE_READY) {
       globalFlags.states.wifiState == GEN_STATE_BUSY;
-    } else if (globalFlags.states.wifiState == GEN_STATE_BUSY) { return PROC_STATUS_BUSY; } else if (globalFlags.states.wifiState == GEN_STATE_ERROR) { return PROC_STATUS_ERROR; }
+    } else if (globalFlags.states.wifiState == GEN_STATE_BUSY) {
+      return PROC_STATUS_BUSY;
+    } else if (globalFlags.states.wifiState == GEN_STATE_ERROR) {
+      return PROC_STATUS_ERROR;
+    }
 
     // Setup the proceedure
     globalFlags.procedures.wifiProcedures = WIFI_PROC_AT_TEST;
 
     // Step 0 body
-    sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_AT, osWaitForever);
+    sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_AT,
+        osWaitForever);
 
     // Setup re-entry details
     step = 1;
@@ -132,10 +146,13 @@ procStatus_t proc_wifiATTest(msgCommand_t rxCommand) {
   case 1:
     if (rxCommand == MSG_CMD_WIFI_RX_OK) {
       // Step 1 body
-      cHAL_USART_sTransmit_IT(&huart1, txString_OKReceived, strlen(txString_OKReceived), 0);
+      cHAL_USART_sTransmit_IT(&huart1, txString_OKReceived,
+          strlen(txString_OKReceived), 0);
 
-    } else if (rxCommand == MSG_CMD_WIFI_RX_NO_FUNCTION || rxCommand == MSG_CMD_WIFI_RX_ERROR) {
-      cHAL_USART_sTransmit_IT(&huart1, txString_ATCommandTestError, strlen(txString_ATCommandTestError), 0);
+    } else if (rxCommand == MSG_CMD_WIFI_RX_NO_FUNCTION
+        || rxCommand == MSG_CMD_WIFI_RX_ERROR) {
+      cHAL_USART_sTransmit_IT(&huart1, txString_ATCommandTestError,
+          strlen(txString_ATCommandTestError), 0);
     }
 
     // Exit the procedure
@@ -158,13 +175,18 @@ procStatus_t proc_wifiInit(msgCommand_t rxCommand) {
   case 0:
     if (globalFlags.states.wifiState == GEN_STATE_READY) {
       globalFlags.states.wifiState == GEN_STATE_BUSY;
-    } else if (globalFlags.states.wifiState == GEN_STATE_BUSY) { return PROC_STATUS_BUSY; } else if (globalFlags.states.wifiState == GEN_STATE_ERROR) { return PROC_STATUS_ERROR; }
+    } else if (globalFlags.states.wifiState == GEN_STATE_BUSY) {
+      return PROC_STATUS_BUSY;
+    } else if (globalFlags.states.wifiState == GEN_STATE_ERROR) {
+      return PROC_STATUS_ERROR;
+    }
 
     // Setup the proceedure
     globalFlags.procedures.wifiProcedures = WIFI_PROC_INIT;
 
     // Step 0 body - Check AT command set
-    sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_AT, osWaitForever);
+    sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_AT,
+        osWaitForever);
 
     // Setup re-entry details
     step = 1;
@@ -172,7 +194,8 @@ procStatus_t proc_wifiInit(msgCommand_t rxCommand) {
   case 1:
     if (rxCommand == MSG_CMD_WIFI_RX_OK) {
       // Step 1 body - Turn off byte echo
-      sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_ATE_0, osWaitForever);
+      sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_ATE_0,
+          osWaitForever);
 
       // Setup re-entry details
       step = 2;
@@ -184,7 +207,8 @@ procStatus_t proc_wifiInit(msgCommand_t rxCommand) {
   case 2:
     if (rxCommand == MSG_CMD_WIFI_RX_OK) {
       // Step 2 body - Put module into dual mode
-      sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_CWMODE_3, osWaitForever);
+      sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_CWMODE_3,
+          osWaitForever);
 
       // Setup re-entry details
       step = 3;
@@ -195,7 +219,8 @@ procStatus_t proc_wifiInit(msgCommand_t rxCommand) {
     break;
   case 3:
     if (rxCommand == MSG_CMD_NO_CMD || rxCommand == MSG_CMD_WIFI_RX_NO_CHANGE) {
-      sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_CIPMUX_1, osWaitForever);
+      sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_CIPMUX_1,
+          osWaitForever);
 
       // Setup re-entry details
       step = 4;
@@ -207,7 +232,8 @@ procStatus_t proc_wifiInit(msgCommand_t rxCommand) {
   case 4:
     if (rxCommand == MSG_CMD_WIFI_RX_OK) {
       // Exit the proceedure
-      cHAL_USART_sTransmit_IT(&huart1, txString_wifiInitialised, strlen(txString_wifiInitialised), 0);
+      cHAL_USART_sTransmit_IT(&huart1, txString_wifiInitialised,
+          strlen(txString_wifiInitialised), 0);
 
       step = 0;
       globalFlags.procedures.wifiProcedures = WIFI_PROC_NONE;
@@ -233,13 +259,18 @@ procStatus_t proc_wifiConnectAP(msgCommand_t rxCommand) {
   case 0:
     if (globalFlags.states.wifiState == GEN_STATE_READY) {
       globalFlags.states.wifiState == GEN_STATE_BUSY;
-    } else if (globalFlags.states.wifiState == GEN_STATE_BUSY) { return PROC_STATUS_BUSY; } else if (globalFlags.states.wifiState == GEN_STATE_ERROR) { return PROC_STATUS_ERROR; }
+    } else if (globalFlags.states.wifiState == GEN_STATE_BUSY) {
+      return PROC_STATUS_BUSY;
+    } else if (globalFlags.states.wifiState == GEN_STATE_ERROR) {
+      return PROC_STATUS_ERROR;
+    }
 
     // Setup the proceedure
     globalFlags.procedures.wifiProcedures = WIFI_PROC_CONNECT_AP;
 
     // Step 0 body - Check AT command set
-    sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_AT, osWaitForever);
+    sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_AT,
+        osWaitForever);
 
     // Setup re-entry details
     step = 1;
@@ -247,7 +278,8 @@ procStatus_t proc_wifiConnectAP(msgCommand_t rxCommand) {
   case 1:
     if (rxCommand == MSG_CMD_WIFI_RX_OK) {
       // Exit the proceedure
-      sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_CONNECT_AP, osWaitForever);
+      sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_CONNECT_AP,
+          osWaitForever);
 
       step = 2;
     } else {
@@ -257,7 +289,8 @@ procStatus_t proc_wifiConnectAP(msgCommand_t rxCommand) {
     break;
   case 2:
     if (rxCommand == MSG_CMD_WIFI_RX_OK) {
-      cHAL_USART_sTransmit_IT(&huart1, txString_wifiConnected, strlen(txString_wifiConnected), 0);
+      cHAL_USART_sTransmit_IT(&huart1, txString_wifiConnected,
+          strlen(txString_wifiConnected), 0);
 
     } else if (rxCommand == MSG_CMD_WIFI_RX_FAIL) {
 
