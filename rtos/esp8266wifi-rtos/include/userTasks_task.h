@@ -26,6 +26,7 @@
 typedef enum {
   PROC_STATUS_OK,
   PROC_STATUS_BUSY,
+  PROC_STATUS_COMPLETED,
   PROC_STATUS_ERROR
 } procStatus_t;
 
