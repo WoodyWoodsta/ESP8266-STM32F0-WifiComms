@@ -14,6 +14,7 @@ static void interpretCommand(msgCommand_t rxCommand);
 static procStatus_t proc_wifiATTest(msgCommand_t rxCommand);
 static procStatus_t proc_wifiInit(msgCommand_t rxCommand);
 static procStatus_t proc_wifiConnectAP(msgCommand_t rxCommand);
+static procStatus_t proc_wifiStartServer(msgCommand_t rxCommand);
 
 // == Function Definitions ==
 /**
@@ -98,6 +99,24 @@ static void interpretCommand(msgCommand_t rxCommand) {
     } while (status != PROC_STATUS_OK && status != PROC_STATUS_COMPLETED);
     return;
   }
+  case MSG_CMD_WIFI_RX_START_SERVER: {
+    procStatus_t status;
+    do {
+      status = proc_wifiStartServer(rxCommand);
+
+      // Handle the error
+      if (status == PROC_STATUS_ERROR) {
+        cHAL_USART_sTransmit_IT(&huart1, txString_ATCommandTestError,
+            strlen(txString_ATCommandTestError), 0);
+        globalFlags.states.wifiState = GEN_STATE_READY;
+        return;
+      } else if (status == PROC_STATUS_BUSY) {
+        osDelay(100);
+      } // If the peripheral is busy, wait for a bit
+    } while (status != PROC_STATUS_OK && status != PROC_STATUS_COMPLETED);
+    return;
+  }
+
   default:
     break;
   }
@@ -112,6 +131,9 @@ static void interpretCommand(msgCommand_t rxCommand) {
     break;
   case WIFI_PROC_CONNECT_AP:
     proc_wifiConnectAP(rxCommand);
+    break;
+  case WIFI_PROC_START_SERVER:
+    proc_wifiStartServer(rxCommand);
     break;
   default:
     break;
@@ -316,6 +338,72 @@ procStatus_t proc_wifiConnectAP(msgCommand_t rxCommand) {
         step = 3;
       }
       step = 0;
+      globalFlags.procedures.wifiProcedures = WIFI_PROC_NONE;
+      globalFlags.states.wifiState = GEN_STATE_READY;
+      return PROC_STATUS_COMPLETED;
+      break;
+    case 3:
+      globalFlags.procedures.wifiProcedures = WIFI_PROC_NONE;
+      globalFlags.states.wifiState = GEN_STATE_READY;
+      return PROC_STATUS_ERROR;
+    default:
+      break;
+    }
+  }
+  return PROC_STATUS_OK;
+}
+
+static procStatus_t proc_wifiStartServer(msgCommand_t rxCommand) {
+  static uint8_t step = 0;
+  uint8_t finished = 0;
+
+  // If we are not waiting on a CMD, but the procedure function was called, we need to run through anyway
+  // We also need to run through if the command is the one we are waiting for
+  while (!finished) {
+    switch (step) {
+    case 0:
+      if (globalFlags.states.wifiState == GEN_STATE_READY) {
+        globalFlags.states.wifiState = GEN_STATE_BUSY;
+      } else if (globalFlags.states.wifiState == GEN_STATE_BUSY) {
+        return PROC_STATUS_BUSY;
+      } else if (globalFlags.states.wifiState == GEN_STATE_ERROR) {
+        return PROC_STATUS_ERROR;
+      }
+
+      // Setup the proceedure
+      globalFlags.procedures.wifiProcedures = WIFI_PROC_START_SERVER;
+
+      // Step 0 body - Check AT command set
+      sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_TX_AT,
+      osWaitForever);
+
+      // Setup re-entry details
+      step = 1;
+      finished = 1;
+      break;
+    case 1:
+      if (rxCommand == MSG_CMD_WIFI_RX_OK) {
+        // Send command to send command to start server
+        sendCommand(msgQUSARTOut, MSG_SRC_BOSS_TASK,
+            MSG_CMD_WIFI_TX_START_SERVER,
+            osWaitForever);
+
+        step = 2;
+        finished = 1;
+      } else {
+        step = 3;
+      }
+
+      break;
+    case 2:
+      if (rxCommand == MSG_CMD_WIFI_RX_OK
+          || rxCommand == MSG_CMD_WIFI_RX_NO_CHANGE) {
+        cHAL_USART_sTransmit_IT(&huart1, txString_wifiServerStarted,
+            strlen(txString_wifiServerStarted), 0);
+
+        step = 0;
+      }
+
       globalFlags.procedures.wifiProcedures = WIFI_PROC_NONE;
       globalFlags.states.wifiState = GEN_STATE_READY;
       return PROC_STATUS_COMPLETED;

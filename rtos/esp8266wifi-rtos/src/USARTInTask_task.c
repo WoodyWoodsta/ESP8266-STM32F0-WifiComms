@@ -65,6 +65,8 @@ static void interpretUSBString(msg_stringMessage_t *pStringMessageIn) {
       sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_INIT, osWaitForever);
     } else if (strncmp(rxString_wifiConnectAp, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
       sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_CONNECT_AP, osWaitForever);
+    } else if (strncmp(rxString_wifiStartServer, pStringMessageIn->pString, pStringMessageIn->stringLength) == 0) {
+      sendCommand(msgQBoss, MSG_SRC_USART_IN_TASK, MSG_CMD_WIFI_RX_START_SERVER, osWaitForever);
     }
 
     vPortFree(pStringMessageIn->pString);
