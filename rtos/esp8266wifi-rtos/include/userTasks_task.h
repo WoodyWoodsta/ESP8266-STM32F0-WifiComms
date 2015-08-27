@@ -49,7 +49,8 @@ typedef enum {
   WIFI_PROC_NONE,
   WIFI_PROC_AT_TEST,
   WIFI_PROC_INIT,
-  WIFI_PROC_CONNECT_AP
+  WIFI_PROC_CONNECT_AP,
+  WIFI_PROC_START_SERVER
 } wifiProcedures_t;
 
 // Proceedure flags
