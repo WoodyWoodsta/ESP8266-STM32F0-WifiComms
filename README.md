@@ -2,3 +2,5 @@
 Test project to get some basic communication between the STM32F0 and a PC via the ESP8266 Wifi module
 
 Also, a bit of javascript to chat between the PC and the wifi chip
+
+***Project is no longer developed here. Merged into robot project as part of a private repo.***
