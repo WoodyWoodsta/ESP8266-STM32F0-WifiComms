@@ -7,10 +7,16 @@ var net = require('net'); // Load up the required library for TCP stuff
 
 // Create a new TCP socket
 var client = new net.Socket();
-client.connect(3000, '192.168.137.243', function() { // Connect to the chip
+client.connect(3000, '192.168.137.176', function() { // Connect to the chip
   console.log('Connected');
 
   client.write('This is a very long string to test out the wifi to it\'s fullllllll capacity!!!\r\n');
+  client.write('This is a very long string to test out the wifi to it\'s fullllllll capacity!!!\r\n');
+  client.write('This is a very long string to test out the wifi to it\'s fullllllll capacity!!!\r\n');
+  client.write('This is a very long string to test out the wifi to it\'s fullllllll capacity!!!\r\n');
+  client.write('This is a very long string to test out the wifi to it\'s fullllllll capacity!!!\r\n');
+  client.write('This is a very long string to test out the wifi to it\'s fullllllll capacity!!!\r\n');
+  // client.write('This is a very long string to test out the wifi to it\'s fullllllll capacity!!!\r\n');
   // console.log('LEDs Off command sent');
 });
 
@@ -25,5 +31,12 @@ client.on('close', function() {
 // Callback upon receiving data from the server
 function data(data) {
   console.log('Received: ' + data);
+  client.write('This is a very long string to test out the wifi to it\'s fullllllll capacity!!!\r\n');
+  // client.write('This is a very long string to test out the wifi to it\'s fullllllll capacity!!!\r\n');
+  // client.write('This is a very long string to test out the wifi to it\'s fullllllll capacity!!!\r\n');
+  // client.write('This is a very long string to test out the wifi to it\'s fullllllll capacity!!!\r\n');
+  // client.write('This is a very long string to test out the wifi to it\'s fullllllll capacity!!!\r\n');
+  // client.write('This is a very long string to test out the wifi to it\'s fullllllll capacity!!!\r\n');
+
   // client.destroy(); // kill client after server's response
 }

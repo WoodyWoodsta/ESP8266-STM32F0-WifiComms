@@ -27,6 +27,13 @@ void StartBossTask(void const * argument) {
   cHAL_UART_TermReceive_IT(&huart2, 512);
 
   msg_genericMessage_t rxMessage;
+
+  // If in AUTO mode, set off a WIFI startup
+//  if (globalFlags.states.commState == COMM_STATE_AUTO) {
+//    sendCommand(msgQBoss, MSG_SRC_BOSS_TASK, MSG_CMD_WIFI_INIT,
+//        osWaitForever);
+//  }
+
   /* Infinite loop */
   for (;;) {
     fetchMessage(msgQBoss, &rxMessage, 0);
